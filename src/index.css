@@ -1,16 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap");
 /* Custom Dhivehi font imports */
 @font-face {
-  font-family: 'MV-Waheed';
-  src: url('/fonts/MVWaheed.ttf') format('truetype');
+  font-family: "MV-Waheed";
+  src: url("public/fonts/MVWaheed.TTF") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Faseyha';
-  src: url('/fonts/Faseyha.ttf') format('truetype');
+  font-family: "Faseyha";
+  src: url("public/fonts/faseyha.TTF") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -88,11 +88,11 @@
   * {
     @apply border-border;
   }
-  
+
   html {
     direction: rtl;
   }
-  
+
   body {
     @apply bg-gaafu-background text-gaafu-foreground;
     font-feature-settings: "kern", "liga", "calt";
@@ -123,20 +123,20 @@
     opacity: 0;
     transition: opacity 300ms;
   }
-  
+
   /* Article style enhancements */
   .article-content {
     @apply leading-relaxed space-y-6;
   }
-  
+
   .article-content p {
     @apply text-lg;
   }
-  
+
   .article-content h2 {
     @apply text-2xl font-semibold mt-8 mb-4;
   }
-  
+
   /* Category label styles */
   .category-label {
     @apply inline-block px-3 py-1.5 text-xs font-medium rounded-full;
@@ -146,7 +146,7 @@
   .card-shadow {
     @apply shadow-md hover:shadow-lg transition-shadow duration-300;
   }
-  
+
   /* Mobile menu styles */
   .mobile-menu {
     height: 100dvh;
