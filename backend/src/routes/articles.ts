@@ -5,6 +5,31 @@ import { uploadImage } from "../utils/storage";
 
 const router = express.Router();
 
+// Middleware to handle authentication
+const requireAuth = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ error: 'No authorization header' });
+  }
+
+  try {
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error } = await db.auth.getUser(token);
+    
+    if (error || !user) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    // Add user and token to request object
+    (req as any).user = user;
+    (req as any).token = token;
+    next();
+  } catch (error) {
+    console.error('Auth error:', error);
+    return res.status(401).json({ error: 'Authentication failed' });
+  }
+};
+
 // Get all articles
 router.get("/", async (req, res, next) => {
   try {
@@ -53,37 +78,81 @@ router.get("/:id", async (req, res, next) => {
 });
 
 // Create article
-router.post("/", upload.single("image"), async (req, res) => {
+router.post("/", requireAuth, upload.single("image"), async (req, res) => {
   try {
+    console.log('Received article creation request');
+    console.log('Request body:', req.body);
+    console.log('File:', req.file);
+    console.log('User:', (req as any).user);
+
     let imageUrl = null;
 
     // Upload image if provided
     if (req.file) {
-      imageUrl = await uploadImage(req.file);
+      console.log('Processing image upload...');
+      try {
+        // Pass the access token to the upload function
+        imageUrl = await uploadImage(req.file, "article-images", (req as any).token);
+        console.log('Image uploaded successfully:', imageUrl);
+      } catch (uploadError: any) {
+        console.error('Image upload failed:', uploadError);
+        return res.status(500).json({ error: "Failed to upload image", details: uploadError.message });
+      }
     }
 
-    const { title, content, excerpt, category_id, author } = req.body;
+    const { title, content, excerpt, category_id } = req.body;
+
+    // Validate required fields
+    if (!title || !content || !category_id) {
+      console.error('Missing required fields:', { title, content, category_id });
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Create article data object
+    const articleData = {
+      title,
+      content,
+      category_id,
+      image_url: imageUrl,
+      created_at: new Date().toISOString(),
+    };
+
+    // Add excerpt if provided
+    if (excerpt) {
+      Object.assign(articleData, { excerpt });
+    }
+
+    console.log('Creating article with data:', articleData);
 
     const { data: article, error } = await db
       .from("articles")
-      .insert({
-        title,
-        content,
-        excerpt,
-        category_id,
-        author,
-        image_url: imageUrl,
-        created_at: new Date().toISOString(),
-      })
+      .insert(articleData)
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({ 
+        error: "Failed to create article", 
+        details: error.message,
+        code: error.code 
+      });
+    }
 
+    if (!article) {
+      console.error('No article returned after creation');
+      return res.status(500).json({ error: "Article creation failed - no data returned" });
+    }
+
+    console.log('Article created successfully:', article);
     res.status(201).json(article);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error creating article:", error);
-    res.status(500).json({ error: "Failed to create article" });
+    res.status(500).json({ 
+      error: "Failed to create article",
+      details: error.message,
+      stack: error.stack
+    });
   }
 });
 

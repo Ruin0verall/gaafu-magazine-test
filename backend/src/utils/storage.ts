@@ -1,5 +1,9 @@
 import { db } from "../db";
 import type { Request } from "express";
+import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Generate a unique filename with timestamp
 const generateUniqueFileName = (originalName: string) => {
@@ -12,12 +16,48 @@ const generateUniqueFileName = (originalName: string) => {
 
 export const uploadImage = async (
   file: Express.Multer.File,
-  bucket: string = "article-images"
+  bucket: string = "article-images",
+  accessToken?: string
 ): Promise<string> => {
   try {
-    const fileName = generateUniqueFileName(file.originalname);
+    console.log('Starting image upload process...');
+    console.log('File details:', {
+      originalName: file.originalname,
+      mimetype: file.mimetype,
+      size: file.size,
+      bucket: bucket
+    });
 
-    const { data, error } = await db.storage
+    // Create a new Supabase client with the access token
+    const client = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+        global: {
+          headers: accessToken ? {
+            Authorization: `Bearer ${accessToken}`
+          } : undefined
+        },
+      }
+    );
+
+    // Verify authentication
+    const { data: { user }, error: authError } = await client.auth.getUser(accessToken);
+    if (authError || !user) {
+      console.error('Authentication error:', authError);
+      throw new Error('Authentication failed');
+    }
+    console.log('Authentication successful. User:', user.email);
+
+    const fileName = generateUniqueFileName(file.originalname);
+    console.log('Generated filename:', fileName);
+
+    console.log('Attempting to upload file to bucket:', bucket);
+    const { data, error } = await client.storage
       .from(bucket)
       .upload(fileName, file.buffer, {
         contentType: file.mimetype,
@@ -25,16 +65,28 @@ export const uploadImage = async (
         upsert: false,
       });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase storage error:', error);
+      throw error;
+    }
+
+    console.log('File uploaded successfully:', data);
 
     // Get the public URL for the uploaded file
     const {
       data: { publicUrl },
-    } = db.storage.from(bucket).getPublicUrl(fileName);
+    } = client.storage.from(bucket).getPublicUrl(fileName);
 
+    console.log('Generated public URL:', publicUrl);
     return publicUrl;
-  } catch (error) {
-    console.error("Error uploading image:", error);
+  } catch (err: any) {
+    console.error("Error uploading image:", err);
+    if (err.error?.message) {
+      console.error("Supabase error message:", err.error.message);
+    }
+    if (err.message) {
+      console.error("Error message:", err.message);
+    }
     throw new Error("Failed to upload image");
   }
 };
