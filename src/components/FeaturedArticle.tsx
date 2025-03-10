@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Article, categoryColors, categoryLabels } from '@/lib/types';
 
@@ -7,14 +6,14 @@ interface FeaturedArticleProps {
 }
 
 const FeaturedArticle = ({ article }: FeaturedArticleProps) => {
-  const { id, title, excerpt, coverImage, category } = article;
+  const { id, title, excerpt, image_url, category } = article;
 
   return (
     <div className="relative h-[65vh] min-h-[450px] max-h-[600px] overflow-hidden rounded-2xl shadow-lg">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img 
-          src={coverImage} 
+          src={image_url} 
           alt={title}
           className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105"
         />

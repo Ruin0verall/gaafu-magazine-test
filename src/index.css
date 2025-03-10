@@ -2,7 +2,7 @@
 /* Custom Dhivehi font imports */
 @font-face {
   font-family: "MV-Waheed";
-  src: url("/fonts/MVWaheed.TTF") format("truetype");
+  src: url("public/fonts/MVWaheed.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -10,7 +10,7 @@
 
 @font-face {
   font-family: "Faseyha";
-  src: url("/fonts/faseyha.TTF") format("truetype");
+  src: url("public/fonts/faseyha.TTF") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
