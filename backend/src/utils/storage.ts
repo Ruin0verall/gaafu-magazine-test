@@ -23,12 +23,14 @@ interface UploadResponse {
  * Uploads a file to Supabase storage
  * @param file - File buffer to upload
  * @param originalName - Original filename
+ * @param token - Authentication token (not used with service role key)
  * @returns Promise with the upload response
  * @throws Error if upload fails
  */
 export const uploadFile = async (
   file: Buffer,
-  originalName: string
+  originalName: string,
+  token?: string
 ): Promise<UploadResponse> => {
   try {
     // Generate unique filename
@@ -36,7 +38,14 @@ export const uploadFile = async (
     const fileName = `${uuidv4()}.${fileExt}`;
     const filePath = `${fileName}`;
 
-    // Upload file to Supabase Storage
+    console.log('Attempting to upload file:', {
+      bucket: STORAGE_BUCKET,
+      path: filePath,
+      size: file.length,
+      type: `image/${fileExt}`
+    });
+
+    // Upload file to Supabase Storage using service role key
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(STORAGE_BUCKET)
       .upload(filePath, file, {
@@ -46,44 +55,49 @@ export const uploadFile = async (
       });
 
     if (uploadError) {
+      console.error('Upload error:', uploadError);
       throw new Error(`Failed to upload file: ${uploadError.message}`);
     }
 
-    // Get public URL for the uploaded file
-    const { data: urlData } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .createSignedUrl(filePath, PUBLIC_URL_EXPIRY);
+    console.log('File uploaded successfully:', uploadData);
 
-    if (!urlData?.signedUrl) {
-      throw new Error('Failed to generate signed URL for uploaded file');
+    // Get public URL for the uploaded file
+    const { data: publicUrlData } = supabase.storage
+      .from(STORAGE_BUCKET)
+      .getPublicUrl(filePath);
+
+    if (!publicUrlData?.publicUrl) {
+      throw new Error('Failed to generate public URL for uploaded file');
     }
 
     return {
-      url: urlData.signedUrl,
+      url: publicUrlData.publicUrl,
       path: filePath
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in uploadFile:', error);
-    throw error;
+    throw new Error(`Failed to upload file: ${error.message}`);
   }
 };
 
 /**
  * Deletes a file from Supabase storage
  * @param filePath - Path of the file to delete
+ * @param token - Authentication token (not used with service role key)
  * @throws Error if deletion fails
  */
-export const deleteFile = async (filePath: string): Promise<void> => {
+export const deleteFile = async (filePath: string, token?: string): Promise<void> => {
   try {
     const { error: deleteError } = await supabase.storage
       .from(STORAGE_BUCKET)
       .remove([filePath]);
 
     if (deleteError) {
+      console.error('Delete error:', deleteError);
       throw new Error(`Failed to delete file: ${deleteError.message}`);
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in deleteFile:', error);
-    throw error;
+    throw new Error(`Failed to delete file: ${error.message}`);
   }
 };

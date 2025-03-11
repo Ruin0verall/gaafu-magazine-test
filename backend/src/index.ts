@@ -2,6 +2,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import morgan from "morgan";
 
 // Middleware imports
 import { errorHandler } from "./middleware/errorHandler";
@@ -28,8 +29,9 @@ app.use(cors({
 }));
 
 // Body parsing middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(morgan('dev'));
 app.use(requestLogger);
 
 // API routes
@@ -39,15 +41,10 @@ app.use("/api/auth", authRouter);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
-  // Add CORS headers directly to this endpoint for debugging
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
-  
   res.json({ 
-    status: "ok", 
-    message: "Server is running",
-    timestamp: new Date().toISOString()
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
   });
 });
 
@@ -72,6 +69,7 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  console.log(`Health check available at http://localhost:${PORT}/api/health`);
-  console.log(`Auth test endpoint at http://localhost:${PORT}/api/auth/test`);
+  console.log('CORS enabled for origins:', ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:8082', 'http://127.0.0.1:8082']);
 });
+
+export default app;

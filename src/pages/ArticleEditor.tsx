@@ -27,6 +27,7 @@ const ArticleEditor: React.FC = () => {
     category_id: '',
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -48,10 +49,11 @@ const ArticleEditor: React.FC = () => {
         },
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
+      if (!response.ok) throw new Error(data.error || 'Failed to fetch categories');
       setCategories(data);
     } catch (err: any) {
       setError(err.message);
+      console.error('Error fetching categories:', err);
     }
   };
 
@@ -63,7 +65,7 @@ const ArticleEditor: React.FC = () => {
         },
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
+      if (!response.ok) throw new Error(data.error || 'Failed to fetch article');
       setFormData({
         title: data.title,
         content: data.content,
@@ -75,30 +77,69 @@ const ArticleEditor: React.FC = () => {
       }
     } catch (err: any) {
       setError(err.message);
+      console.error('Error fetching article:', err);
     }
+  };
+
+  const validateImage = (file: File): boolean => {
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!validTypes.includes(file.type)) {
+      setError('Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.');
+      return false;
+    }
+
+    if (file.size > maxSize) {
+      setError('File size too large. Maximum size is 5MB.');
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
-    const formDataToSend = new FormData();
-    formDataToSend.append('title', formData.title);
-    formDataToSend.append('content', formData.content);
-    formDataToSend.append('category_id', formData.category_id);
-    if (formData.excerpt) {
-      formDataToSend.append('excerpt', formData.excerpt);
-    }
-    if (formData.image) {
-      formDataToSend.append('image', formData.image);
-    }
+    setUploadProgress(0);
 
     try {
+      // Validate required fields
+      if (!formData.title.trim() || !formData.content.trim() || !formData.category_id) {
+        throw new Error('Please fill in all required fields');
+      }
+
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title.trim());
+      formDataToSend.append('content', formData.content.trim());
+      formDataToSend.append('category_id', formData.category_id);
+      
+      if (formData.excerpt?.trim()) {
+        formDataToSend.append('excerpt', formData.excerpt.trim());
+      }
+      
+      if (formData.image) {
+        if (!validateImage(formData.image)) {
+          setLoading(false);
+          return;
+        }
+        formDataToSend.append('image', formData.image);
+      }
+
       const url = id
         ? `http://localhost:5000/api/articles/${id}`
         : 'http://localhost:5000/api/articles';
       const method = id ? 'PUT' : 'POST';
+
+      console.log(`Submitting article ${method} request to ${url}`);
+      if (formData.image) {
+        console.log('Image included in submission:', {
+          name: formData.image.name,
+          type: formData.image.type,
+          size: formData.image.size
+        });
+      }
 
       const response = await fetch(url, {
         method,
@@ -109,25 +150,34 @@ const ArticleEditor: React.FC = () => {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
+      
+      if (!response.ok) {
+        console.error('Server error response:', data);
+        throw new Error(data.error || data.details || 'Failed to save article');
+      }
 
+      console.log('Article saved successfully:', data);
       navigate('/admin/dashboard');
     } catch (err: any) {
-      setError(err.message);
+      console.error('Error saving article:', err);
+      setError(err.message || 'An unexpected error occurred');
     } finally {
       setLoading(false);
     }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError('');
     const file = e.target.files?.[0];
     if (file) {
-      setFormData({ ...formData, image: file });
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      if (validateImage(file)) {
+        setFormData({ ...formData, image: file });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -153,6 +203,16 @@ const ArticleEditor: React.FC = () => {
                   {error && (
                     <div className="rounded-md bg-red-50 p-4">
                       <div className="text-sm text-red-700">{error}</div>
+                    </div>
+                  )}
+
+                  {loading && (
+                    <div className="rounded-md bg-blue-50 p-4">
+                      <div className="text-sm text-blue-700">
+                        {uploadProgress > 0 
+                          ? `Uploading... ${uploadProgress}%`
+                          : 'Saving article...'}
+                      </div>
                     </div>
                   )}
 

@@ -77,26 +77,36 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// Create article
+// Create article with image upload
 router.post("/", requireAuth, upload.single("image"), async (req, res) => {
   try {
-    console.log('Received article creation request');
-    console.log('Request body:', req.body);
-    console.log('File:', req.file);
-    console.log('User:', (req as any).user);
+    console.log('Creating article with data:', { 
+      ...req.body, 
+      file: req.file ? {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size
+      } : 'not present'
+    });
 
     let imageUrl = null;
 
     // Upload image if provided
     if (req.file) {
-      console.log('Processing image upload...');
       try {
-        const uploadResult = await uploadFile(req.file.buffer, req.file.originalname);
+        console.log('Processing image upload...');
+        const uploadResult = await uploadFile(
+          req.file.buffer, 
+          req.file.originalname
+        );
         imageUrl = uploadResult.url;
-        console.log('Image uploaded successfully:', imageUrl);
+        console.log('Image uploaded successfully:', { url: imageUrl });
       } catch (uploadError: any) {
         console.error('Image upload failed:', uploadError);
-        return res.status(500).json({ error: "Failed to upload image", details: uploadError.message });
+        return res.status(500).json({ 
+          error: "Failed to upload image", 
+          details: uploadError.message 
+        });
       }
     }
 
@@ -105,58 +115,56 @@ router.post("/", requireAuth, upload.single("image"), async (req, res) => {
     // Validate required fields
     if (!title || !content || !category_id) {
       console.error('Missing required fields:', { title, content, category_id });
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    // Create article data object
-    const articleData = {
-      title,
-      content,
-      category_id,
-      image_url: imageUrl,
-      created_at: new Date().toISOString(),
-    };
-
-    // Add excerpt if provided
-    if (excerpt) {
-      Object.assign(articleData, { excerpt });
-    }
-
-    console.log('Creating article with data:', articleData);
-
-    const { data: article, error } = await db
-      .from("articles")
-      .insert(articleData)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Database error:', error);
-      return res.status(500).json({ 
-        error: "Failed to create article", 
-        details: error.message,
-        code: error.code 
+      return res.status(400).json({ 
+        error: "Missing required fields",
+        details: {
+          title: !title,
+          content: !content,
+          category_id: !category_id
+        }
       });
     }
 
+    // Create article data object matching the database schema
+    const articleData = {
+      title: title.trim(),
+      content: content.trim(),
+      category_id: parseInt(category_id, 10), // Ensure category_id is a number
+      image_url: imageUrl,
+      created_at: new Date().toISOString(),
+      ...(excerpt && { excerpt: excerpt.trim() })
+    };
+
+    console.log('Attempting to insert article with data:', articleData);
+
+    const { data: article, error: dbError } = await db
+      .from("articles")
+      .insert([articleData])
+      .select()
+      .single();
+
+    if (dbError) {
+      console.error('Database error:', dbError);
+      throw new Error(`Database error: ${dbError.message}`);
+    }
+
     if (!article) {
-      console.error('No article returned after creation');
-      return res.status(500).json({ error: "Article creation failed - no data returned" });
+      throw new Error('Article creation failed - no data returned');
     }
 
     console.log('Article created successfully:', article);
     res.status(201).json(article);
   } catch (error: any) {
-    console.error("Error creating article:", error);
+    console.error('Error creating article:', error);
     res.status(500).json({ 
-      error: "Failed to create article",
+      error: 'Failed to create article',
       details: error.message,
-      stack: error.stack
+      ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
     });
   }
 });
 
-// Update article
+// Update article with image upload
 router.put("/:id", requireAuth, upload.single("image"), async (req, res) => {
   try {
     const { id } = req.params;
@@ -165,11 +173,21 @@ router.put("/:id", requireAuth, upload.single("image"), async (req, res) => {
     // Upload new image if provided
     if (req.file) {
       try {
-        const uploadResult = await uploadFile(req.file.buffer, req.file.originalname);
+        console.log('Processing image upload for update...');
+        const uploadResult = await uploadFile(
+          req.file.buffer, 
+          req.file.originalname,
+          (req as any).token
+        );
         updates.image_url = uploadResult.url;
+        updates.image_path = uploadResult.path;
+        console.log('Image uploaded successfully:', { url: updates.image_url, path: updates.image_path });
       } catch (uploadError: any) {
         console.error('Image upload failed:', uploadError);
-        return res.status(500).json({ error: "Failed to upload image", details: uploadError.message });
+        return res.status(500).json({ 
+          error: "Failed to upload image", 
+          details: uploadError.message 
+        });
       }
     }
 
@@ -188,10 +206,10 @@ router.put("/:id", requireAuth, upload.single("image"), async (req, res) => {
 
     res.json(article);
   } catch (error: any) {
-    console.error("Error updating article:", error);
+    console.error('Error updating article:', error);
     res.status(500).json({ 
-      error: "Failed to update article",
-      details: error.message
+      error: 'Failed to update article',
+      details: error.message 
     });
   }
 });
@@ -201,9 +219,22 @@ router.delete("/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { error } = await db.from("articles").delete().eq("id", id);
+    // First, get the article to check if it has an image
+    const { data: article, error: fetchError } = await db
+      .from("articles")
+      .select("image_path")
+      .eq("id", id)
+      .single();
 
-    if (error) throw error;
+    if (fetchError) throw fetchError;
+
+    // Delete the article
+    const { error: deleteError } = await db
+      .from("articles")
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) throw deleteError;
 
     res.json({ message: "Article deleted successfully" });
   } catch (error: any) {
