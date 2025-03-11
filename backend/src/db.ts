@@ -1,22 +1,51 @@
-import { createClient } from "@supabase/supabase-js";
+/**
+ * Database configuration and utility functions
+ */
+
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./types/database";
 import dotenv from "dotenv";
 
+// Load environment variables
 dotenv.config();
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_ANON_KEY!;
+// Environment variables validation
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-// Create the main client with anon key
-export const db = createClient<Database>(supabaseUrl, supabaseKey);
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing required Supabase configuration. Check your .env file.');
+}
 
-// Create an admin client with service role key if available
-export const adminDb = supabaseServiceKey 
+// Database client types
+export type DbClient = SupabaseClient<Database>;
+export type AuthResponse = Awaited<ReturnType<DbClient['auth']['signInWithPassword']>>['data'];
+
+/**
+ * Main database client with anonymous access
+ */
+export const db: DbClient = createClient<Database>(supabaseUrl, supabaseKey);
+
+/**
+ * Admin database client with elevated privileges
+ * Only available if service role key is provided
+ */
+export const adminDb: DbClient | null = supabaseServiceKey 
   ? createClient<Database>(supabaseUrl, supabaseServiceKey)
   : null;
 
-export const signInWithEmail = async (email: string, password: string) => {
+/**
+ * Authenticate user with email and password
+ * @param email - User's email
+ * @param password - User's password
+ * @returns Authentication data
+ * @throws Error if authentication fails
+ */
+export const signInWithEmail = async (
+  email: string, 
+  password: string
+): Promise<AuthResponse> => {
   const { data, error } = await db.auth.signInWithPassword({
     email,
     password,
@@ -26,8 +55,11 @@ export const signInWithEmail = async (email: string, password: string) => {
   return data;
 };
 
-// Helper function to check if we're authenticated
-export const isAuthenticated = async () => {
+/**
+ * Check if the current session is authenticated
+ * @returns True if authenticated, false otherwise
+ */
+export const isAuthenticated = async (): Promise<boolean> => {
   const { data: { session } } = await db.auth.getSession();
   return !!session;
 };

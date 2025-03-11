@@ -1,54 +1,40 @@
+// Core dependencies
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { supabase } from "./config/supabase";
 
+// Middleware imports
 import { errorHandler } from "./middleware/errorHandler";
 import { requestLogger } from "./middleware/requestLogger";
+
+// Route imports
 import articlesRouter from "./routes/articles";
 import categoriesRouter from "./routes/categories";
 
 // Initialize environment variables
 dotenv.config();
 
+// Create Express application
 const app = express();
 
-// Middleware
+// Global middleware
 app.use(cors());
 app.use(express.json());
 app.use(requestLogger);
 
-// Routes
+// API routes
 app.use("/api/articles", articlesRouter);
 app.use("/api/categories", categoriesRouter);
 
-// Basic test route
+// Health check endpoint
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "Server is running" });
 });
 
-// Test database connection
-app.get("/api/test-db", async (req, res) => {
-  try {
-    const { data, error } = await supabase.from("articles").select("*");
-    if (error) throw error;
-    res.json({
-      success: true,
-      message: "Database connection successful",
-      data,
-    });
-  } catch (error: any) {
-    console.error("Database connection error:", error);
-    res.status(500).json({
-      success: false,
-      error: error.message || "An unknown error occurred",
-    });
-  }
-});
-
-// Error handling middleware
+// Global error handling
 app.use(errorHandler);
 
+// Server initialization
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

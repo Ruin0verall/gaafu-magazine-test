@@ -1,7 +1,7 @@
 import express from "express";
 import { db } from "../db";
 import { upload } from "../middleware/upload";
-import { uploadImage } from "../utils/storage";
+import { uploadFile } from "../utils/storage";
 
 const router = express.Router();
 
@@ -91,8 +91,8 @@ router.post("/", requireAuth, upload.single("image"), async (req, res) => {
     if (req.file) {
       console.log('Processing image upload...');
       try {
-        // Pass the access token to the upload function
-        imageUrl = await uploadImage(req.file, "article-images", (req as any).token);
+        const uploadResult = await uploadFile(req.file.buffer, req.file.originalname);
+        imageUrl = uploadResult.url;
         console.log('Image uploaded successfully:', imageUrl);
       } catch (uploadError: any) {
         console.error('Image upload failed:', uploadError);
@@ -157,14 +157,20 @@ router.post("/", requireAuth, upload.single("image"), async (req, res) => {
 });
 
 // Update article
-router.put("/:id", upload.single("image"), async (req, res) => {
+router.put("/:id", requireAuth, upload.single("image"), async (req, res) => {
   try {
     const { id } = req.params;
     const updates: any = { ...req.body };
 
     // Upload new image if provided
     if (req.file) {
-      updates.image_url = await uploadImage(req.file);
+      try {
+        const uploadResult = await uploadFile(req.file.buffer, req.file.originalname);
+        updates.image_url = uploadResult.url;
+      } catch (uploadError: any) {
+        console.error('Image upload failed:', uploadError);
+        return res.status(500).json({ error: "Failed to upload image", details: uploadError.message });
+      }
     }
 
     const { data: article, error } = await db
@@ -181,14 +187,17 @@ router.put("/:id", upload.single("image"), async (req, res) => {
     }
 
     res.json(article);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating article:", error);
-    res.status(500).json({ error: "Failed to update article" });
+    res.status(500).json({ 
+      error: "Failed to update article",
+      details: error.message
+    });
   }
 });
 
 // Delete article
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -197,9 +206,12 @@ router.delete("/:id", async (req, res) => {
     if (error) throw error;
 
     res.json({ message: "Article deleted successfully" });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error deleting article:", error);
-    res.status(500).json({ error: "Failed to delete article" });
+    res.status(500).json({ 
+      error: "Failed to delete article",
+      details: error.message
+    });
   }
 });
 

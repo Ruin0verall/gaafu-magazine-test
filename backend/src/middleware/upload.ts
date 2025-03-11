@@ -1,26 +1,42 @@
-import multer from "multer";
-import { Request } from "express";
+/**
+ * File upload middleware configuration
+ * Uses multer for handling multipart/form-data
+ */
 
-// Configure multer for memory storage
+import multer from 'multer';
+import path from 'path';
+
+/**
+ * Multer configuration for file uploads
+ */
 const storage = multer.memoryStorage();
 
-// File filter to allow only images
+/**
+ * File filter configuration
+ * Validates file types before upload
+ */
 const fileFilter = (
-  req: Request,
+  req: Express.Request,
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
-) => {
-  if (file.mimetype.startsWith("image/")) {
+): void => {
+  // Allowed file types
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+  
+  if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Not an image! Please upload an image."));
+    cb(new Error('Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.'));
   }
 };
 
-// Export the configured multer middleware
+/**
+ * Multer upload configuration
+ * Limits file size and applies filters
+ */
 export const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
+  storage,
+  fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit
   },

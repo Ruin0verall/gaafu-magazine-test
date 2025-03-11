@@ -1,92 +1,89 @@
-import { db } from "../db";
-import type { Request } from "express";
-import { createClient } from "@supabase/supabase-js";
-import dotenv from "dotenv";
+/**
+ * Storage utility functions for handling file uploads to Supabase Storage
+ */
 
-dotenv.config();
+import { supabase } from '../config/supabase';
+import { v4 as uuidv4 } from 'uuid';
 
-// Generate a unique filename with timestamp
-const generateUniqueFileName = (originalName: string) => {
-  const timestamp = new Date().getTime();
-  const extension = originalName.split(".").pop();
-  return `${timestamp}-${Math.random()
-    .toString(36)
-    .substring(2, 15)}.${extension}`;
-};
+/**
+ * Storage bucket configuration
+ */
+const STORAGE_BUCKET = 'article-images';
+const PUBLIC_URL_EXPIRY = 365 * 24 * 60 * 60; // 1 year in seconds
 
-export const uploadImage = async (
-  file: Express.Multer.File,
-  bucket: string = "article-images",
-  accessToken?: string
-): Promise<string> => {
+/**
+ * Interface for upload response
+ */
+interface UploadResponse {
+  url: string;
+  path: string;
+}
+
+/**
+ * Uploads a file to Supabase storage
+ * @param file - File buffer to upload
+ * @param originalName - Original filename
+ * @returns Promise with the upload response
+ * @throws Error if upload fails
+ */
+export const uploadFile = async (
+  file: Buffer,
+  originalName: string
+): Promise<UploadResponse> => {
   try {
-    console.log('Starting image upload process...');
-    console.log('File details:', {
-      originalName: file.originalname,
-      mimetype: file.mimetype,
-      size: file.size,
-      bucket: bucket
-    });
+    // Generate unique filename
+    const fileExt = originalName.split('.').pop()?.toLowerCase() || 'jpg';
+    const fileName = `${uuidv4()}.${fileExt}`;
+    const filePath = `${fileName}`;
 
-    // Create a new Supabase client with the access token
-    const client = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_ANON_KEY!,
-      {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-        },
-        global: {
-          headers: accessToken ? {
-            Authorization: `Bearer ${accessToken}`
-          } : undefined
-        },
-      }
-    );
-
-    // Verify authentication
-    const { data: { user }, error: authError } = await client.auth.getUser(accessToken);
-    if (authError || !user) {
-      console.error('Authentication error:', authError);
-      throw new Error('Authentication failed');
-    }
-    console.log('Authentication successful. User:', user.email);
-
-    const fileName = generateUniqueFileName(file.originalname);
-    console.log('Generated filename:', fileName);
-
-    console.log('Attempting to upload file to bucket:', bucket);
-    const { data, error } = await client.storage
-      .from(bucket)
-      .upload(fileName, file.buffer, {
-        contentType: file.mimetype,
-        cacheControl: "3600",
-        upsert: false,
+    // Upload file to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(filePath, file, {
+        contentType: `image/${fileExt}`,
+        cacheControl: '3600',
+        upsert: false
       });
 
-    if (error) {
-      console.error('Supabase storage error:', error);
-      throw error;
+    if (uploadError) {
+      throw new Error(`Failed to upload file: ${uploadError.message}`);
     }
 
-    console.log('File uploaded successfully:', data);
+    // Get public URL for the uploaded file
+    const { data: urlData } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .createSignedUrl(filePath, PUBLIC_URL_EXPIRY);
 
-    // Get the public URL for the uploaded file
-    const {
-      data: { publicUrl },
-    } = client.storage.from(bucket).getPublicUrl(fileName);
+    if (!urlData?.signedUrl) {
+      throw new Error('Failed to generate signed URL for uploaded file');
+    }
 
-    console.log('Generated public URL:', publicUrl);
-    return publicUrl;
-  } catch (err: any) {
-    console.error("Error uploading image:", err);
-    if (err.error?.message) {
-      console.error("Supabase error message:", err.error.message);
+    return {
+      url: urlData.signedUrl,
+      path: filePath
+    };
+  } catch (error) {
+    console.error('Error in uploadFile:', error);
+    throw error;
+  }
+};
+
+/**
+ * Deletes a file from Supabase storage
+ * @param filePath - Path of the file to delete
+ * @throws Error if deletion fails
+ */
+export const deleteFile = async (filePath: string): Promise<void> => {
+  try {
+    const { error: deleteError } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .remove([filePath]);
+
+    if (deleteError) {
+      throw new Error(`Failed to delete file: ${deleteError.message}`);
     }
-    if (err.message) {
-      console.error("Error message:", err.message);
-    }
-    throw new Error("Failed to upload image");
+  } catch (error) {
+    console.error('Error in deleteFile:', error);
+    throw error;
   }
 };

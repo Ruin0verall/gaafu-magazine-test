@@ -18,6 +18,8 @@
     "@types/cors": "^2.x.x",
     "@types/multer": "^1.4.12",
     "@types/node": "^20.x.x",
+    "@types/uuid": "^10.0.0",
+    "axios": "^1.8.2",
     "cors": "^2.8.5",
     "dotenv": "^16.x.x",
     "express": "^4.x.x",
@@ -25,7 +27,8 @@
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^2.7.0",
     "ts-node": "^10.x.x",
-    "typescript": "^5.x.x"
+    "typescript": "^5.x.x",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/cors": "^2.x.x",
