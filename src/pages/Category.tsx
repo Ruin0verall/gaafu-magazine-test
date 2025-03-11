@@ -68,7 +68,7 @@ const Category = () => {
           <div className="max-w-7xl mx-auto">
             {/* Category Header */}
             <div className="mb-12 text-center">
-              <h1 className="text-3xl md:text-4xl font-bold mb-3">
+              <h1 className="text-3xl md:text-4xl font-bold mb-3 font-dhivehi">
                 {categoryName}
               </h1>
               <div className="h-1 w-24 bg-gaafu-accent mx-auto"></div>
@@ -92,12 +92,12 @@ const Category = () => {
               </div>
             ) : (
               <div className="text-center py-16">
-                <p className="text-xl text-gaafu-foreground/60 mb-4">
+                <p className="text-xl text-gaafu-foreground/60 mb-4 font-dhivehi">
                   މި ކެޓަގަރީގައި މަޢުލޫމާތެއް ނެތް
                 </p>
                 <Link
                   to="/"
-                  className="text-gaafu-accent hover:text-gaafu-highlight"
+                  className="text-gaafu-accent hover:text-gaafu-highlight font-dhivehi"
                 >
                   މައި ސަފްޙާއަށް ދާންވީތަ؟
                 </Link>

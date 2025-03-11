@@ -85,7 +85,7 @@ const Index = () => {
               <div className="flex space-x-2 space-x-reverse pb-2">
                 <button
                   onClick={() => setSelectedCategory("all")}
-                  className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors shadow-sm ${
+                  className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors shadow-sm font-dhivehi ${
                     selectedCategory === "all"
                       ? "bg-gaafu-accent text-white"
                       : "bg-gaafu-muted text-gaafu-foreground hover:bg-gaafu-accent-light"
@@ -98,7 +98,7 @@ const Index = () => {
                   <button
                     key={key}
                     onClick={() => setSelectedCategory(key as Category)}
-                    className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors shadow-sm ${
+                    className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors shadow-sm font-dhivehi ${
                       selectedCategory === key
                         ? "bg-gaafu-accent text-white"
                         : "bg-gaafu-muted text-gaafu-foreground hover:bg-gaafu-accent-light"
@@ -142,7 +142,7 @@ const Index = () => {
             <div className="text-center mt-12">
               <a
                 href="/latest"
-                className="inline-flex items-center text-gaafu-accent hover:text-gaafu-highlight transition-colors font-medium py-2 px-6 rounded-full bg-gaafu-accent-light/50 hover:bg-gaafu-accent-light"
+                className="inline-flex items-center text-gaafu-accent hover:text-gaafu-highlight transition-colors font-medium py-2 px-6 rounded-full bg-gaafu-accent-light/50 hover:bg-gaafu-accent-light font-dhivehi"
               >
                 އިތުރު ހަބަރުތައް
                 <ChevronRight className="h-4 w-4 mr-1" />

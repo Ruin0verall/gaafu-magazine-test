@@ -83,12 +83,12 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
           {(author || author_name) && (
             <div className="flex items-center gap-1">
               <User className="h-4 w-4" />
-              <span>{author || author_name}</span>
+              <span className="font-dhivehi">{author || author_name}</span>
             </div>
           )}
           <div className="flex items-center gap-1">
             <Calendar className="h-4 w-4" />
-            <span>{formatDate(created_at)}</span>
+            <span className="font-dhivehi">{formatDate(created_at)}</span>
           </div>
         </div>
       </div>

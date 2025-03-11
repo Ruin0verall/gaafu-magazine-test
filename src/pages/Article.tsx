@@ -74,7 +74,7 @@ const Article = () => {
                   to={`/category/${article.category}`}
                   className={`inline-block ${
                     categoryColors[article.category]
-                  } py-1.5 px-4 rounded-full text-sm font-medium shadow-sm`}
+                  } py-1.5 px-4 rounded-full text-sm font-medium shadow-sm font-dhivehi`}
                 >
                   {categoryLabels[article.category]}
                 </Link>
@@ -128,7 +128,7 @@ const Article = () => {
                 </h3>
                 <div className="flex space-x-2 space-x-reverse">
                   <button
-                    className="p-3 rounded-full bg-gaafu-muted hover:bg-gaafu-accent hover:text-white transition-colors shadow-sm"
+                    className="p-3 rounded-full bg-gaafu-muted hover:bg-gaafu-accent hover:text-white transition-colors shadow-sm font-dhivehi"
                     aria-label="Share"
                   >
                     <Share2 className="h-5 w-5" />

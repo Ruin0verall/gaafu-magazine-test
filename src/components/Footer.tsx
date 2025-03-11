@@ -14,7 +14,7 @@ const Footer = () => {
             <Link to="/" className="inline-block">
               <img src="/Logo/White.svg" alt="Gaafu Logo" className="h-8" />
             </Link>
-            <p className="text-white/80">
+            <p className="text-white/80 font-dhivehi">
               ގާފު އަކީ ދިވެހި ބަހުން ހިންގާ ހަބަރާއި މަޢުލޫމާތު ފޯރުކޮށްދޭ
               ފަރާތެކެވެ. އަޅުގަނޑުމެން އަބަދުވެސް މަސައްކަތް ކުރަނީ ރަނގަޅު
               ފެންވަރުގެ ލިޔުންތައް ފޯރުކޮށްދިނުމަށެވެ.
@@ -23,7 +23,7 @@ const Footer = () => {
 
           {/* Categories */}
           <div>
-            <h3 className="text-lg font-medium mb-4 border-b border-white/20 pb-2">
+            <h3 className="text-lg font-medium mb-4 border-b border-white/20 pb-2 font-dhivehi">
               ކެޓަގަރީތައް
             </h3>
             <ul className="space-y-2">
@@ -31,7 +31,7 @@ const Footer = () => {
                 <li key={key}>
                   <Link
                     to={`/category/${key}`}
-                    className="text-white/80 hover:text-white transition-colors"
+                    className="text-white/80 hover:text-white transition-colors font-dhivehi"
                   >
                     {label}
                   </Link>
@@ -42,14 +42,14 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-medium mb-4 border-b border-white/20 pb-2">
+            <h3 className="text-lg font-medium mb-4 border-b border-white/20 pb-2 font-dhivehi">
               މުހިންމު ލިންކުތައް
             </h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   to="/about"
-                  className="text-white/80 hover:text-white transition-colors"
+                  className="text-white/80 hover:text-white transition-colors font-dhivehi"
                 >
                   ގާފުއާއި ބެހޭ
                 </Link>
@@ -57,7 +57,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/privacy"
-                  className="text-white/80 hover:text-white transition-colors"
+                  className="text-white/80 hover:text-white transition-colors font-dhivehi"
                 >
                   ޕްރައިވަސީ ޕޮލިސީ
                 </Link>
@@ -65,7 +65,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/terms"
-                  className="text-white/80 hover:text-white transition-colors"
+                  className="text-white/80 hover:text-white transition-colors font-dhivehi"
                 >
                   ޓާމްސް އޮފް ސަރވިސް
                 </Link>
@@ -73,7 +73,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/contact"
-                  className="text-white/80 hover:text-white transition-colors"
+                  className="text-white/80 hover:text-white transition-colors font-dhivehi"
                 >
                   ގުޅުއްވާ
                 </Link>
@@ -83,12 +83,12 @@ const Footer = () => {
 
           {/* Contact & Social */}
           <div>
-            <h3 className="text-lg font-medium mb-4 border-b border-white/20 pb-2">
+            <h3 className="text-lg font-medium mb-4 border-b border-white/20 pb-2 font-dhivehi">
               ގުޅުއްވާ
             </h3>
             <div className="space-y-4">
-              <p className="text-white/80">info@gaafu.mv</p>
-              <p className="text-white/80">+(960) 7755123</p>
+              <p className="text-white/80 font-dhivehi">info@gaafu.mv</p>
+              <p className="text-white/80 font-dhivehi">+(960) 7755123</p>
               <div className="flex space-x-4 space-x-reverse">
                 <a
                   href="https://facebook.com"
@@ -130,8 +130,10 @@ const Footer = () => {
         </div>
 
         {/* Copyright */}
-        <div className="mt-12 pt-4 border-t border-white/20 text-center text-white/60">
-          <p>© {currentYear} gaafu.mv - ހުރިހާ ޙައްޤެއް ރައްކާތެރިކުރެވިފައި</p>
+        <div className="mt-12 pt-6 border-t border-white/20 text-center text-white/80">
+          <p className="font-dhivehi">
+            © {currentYear} gaafu.mv - ހުރިހާ ޙައްޤެއް ރައްކާތެރިކުރެވިފައި
+          </p>
         </div>
       </div>
     </footer>
