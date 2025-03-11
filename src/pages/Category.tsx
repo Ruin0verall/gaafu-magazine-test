@@ -65,43 +65,45 @@ const Category = () => {
 
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4">
-          {/* Category Header */}
-          <div className="mb-12 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold mb-3">
-              {categoryName}
-            </h1>
-            <div className="h-1 w-24 bg-gaafu-accent mx-auto"></div>
-          </div>
+          <div className="max-w-7xl mx-auto">
+            {/* Category Header */}
+            <div className="mb-12 text-center">
+              <h1 className="text-3xl md:text-4xl font-bold mb-3">
+                {categoryName}
+              </h1>
+              <div className="h-1 w-24 bg-gaafu-accent mx-auto"></div>
+            </div>
 
-          {/* Articles */}
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(6)].map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-gaafu-muted rounded-lg h-80 animate-pulse"
-                ></div>
-              ))}
-            </div>
-          ) : articles.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {articles.map((article) => (
-                <ArticleCard key={article.id} article={article} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <p className="text-xl text-gaafu-foreground/60 mb-4">
-                މި ކެޓަގަރީގައި މަޢުލޫމާތެއް ނެތް
-              </p>
-              <Link
-                to="/"
-                className="text-gaafu-accent hover:text-gaafu-highlight"
-              >
-                މައި ސަފްޙާއަށް ދާންވީތަ؟
-              </Link>
-            </div>
-          )}
+            {/* Articles */}
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-gaafu-muted rounded-lg h-80 animate-pulse"
+                  ></div>
+                ))}
+              </div>
+            ) : articles.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {articles.map((article) => (
+                  <ArticleCard key={article.id} article={article} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <p className="text-xl text-gaafu-foreground/60 mb-4">
+                  މި ކެޓަގަރީގައި މަޢުލޫމާތެއް ނެތް
+                </p>
+                <Link
+                  to="/"
+                  className="text-gaafu-accent hover:text-gaafu-highlight"
+                >
+                  މައި ސަފްޙާއަށް ދާންވީތަ؟
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </main>
 
