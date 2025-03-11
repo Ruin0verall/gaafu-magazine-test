@@ -6,6 +6,9 @@ import FeaturedArticle from "@/components/FeaturedArticle";
 import { useFeaturedArticle, useArticles } from "@/hooks/useArticles";
 import { Category, categoryLabels } from "@/lib/types";
 import { ChevronRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "../lib/supabase";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const { article: featuredArticle, isLoading: featuredLoading } =
@@ -16,15 +19,36 @@ const Index = () => {
   );
   const [isVisible, setIsVisible] = useState(false);
 
+  const {
+    data: articlesData,
+    isLoading: queryLoading,
+    error,
+  } = useQuery({
+    queryKey: ["articles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("articles")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching articles:", error);
+        throw error;
+      }
+
+      return data || [];
+    },
+  });
+
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
   const filteredArticles =
     selectedCategory === "all"
-      ? articles
-      : articles.filter(
-          (article) =>
+      ? articlesData
+      : articlesData.filter(
+          (article: any) =>
             article.category === selectedCategory ||
             article.category_id === getCategoryId(selectedCategory as Category)
         );
@@ -39,6 +63,22 @@ const Index = () => {
       health: 5,
     };
     return categoryMap[category];
+  }
+
+  if (queryLoading) {
+    return <div className="p-4">Loading articles...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 text-red-500">
+        Error loading articles: {(error as Error).message}
+      </div>
+    );
+  }
+
+  if (!articlesData?.length) {
+    return <div className="p-4">No articles found.</div>;
   }
 
   return (
@@ -111,8 +151,31 @@ const Index = () => {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                  {filteredArticles.map((article) => (
-                    <ArticleCard key={article.id} article={article} />
+                  {filteredArticles.map((article: any) => (
+                    <Link
+                      key={article.id}
+                      to={`/article/${article.id}`}
+                      className="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                    >
+                      {article.image_url && (
+                        <img
+                          src={article.image_url}
+                          alt={article.title}
+                          className="w-full h-48 object-cover"
+                        />
+                      )}
+                      <div className="p-4">
+                        <h2 className="text-xl font-semibold mb-2">
+                          {article.title}
+                        </h2>
+                        <p className="text-gray-600 line-clamp-3">
+                          {article.content}
+                        </p>
+                        <div className="mt-4 text-sm text-gray-500">
+                          {new Date(article.created_at).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </Link>
                   ))}
                 </div>
 
