@@ -1,36 +1,48 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Article } from "@/lib/types";
-import { getApiUrl } from "@/lib/config";
-
-const API_URL = getApiUrl();
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 
 const AdminDashboard: React.FC = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { user, loading: authLoading, signOut } = useAuth();
 
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    if (!token) {
+    console.log("Dashboard mount - Auth state:", { user, authLoading });
+
+    if (!authLoading && !user) {
+      console.log("No user found, redirecting to login");
       navigate("/admin/login");
       return;
     }
-    fetchArticles();
-  }, [navigate]);
+
+    if (user) {
+      console.log("User found, fetching articles");
+      fetchArticles();
+    }
+  }, [navigate, user, authLoading]);
 
   const fetchArticles = async () => {
     try {
-      const response = await fetch(`${API_URL}/articles`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-      setArticles(data);
+      console.log("Fetching articles...");
+      const { data, error } = await supabase
+        .from("articles")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching articles:", error);
+        throw error;
+      }
+
+      console.log("Articles fetched:", data?.length || 0);
+      setArticles(data || []);
     } catch (err: any) {
+      console.error("Error in fetchArticles:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -42,31 +54,37 @@ const AdminDashboard: React.FC = () => {
       return;
 
     try {
-      const response = await fetch(`${API_URL}/articles/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        },
-      });
+      const { error } = await supabase.from("articles").delete().eq("id", id);
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error);
-      }
-
+      if (error) throw error;
       setArticles(articles.filter((article) => article.id !== id));
     } catch (err: any) {
+      console.error("Error deleting article:", err);
       setError(err.message);
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminUser");
-    navigate("/admin/login");
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate("/admin/login");
+    } catch (err: any) {
+      console.error("Error signing out:", err);
+      setError(err.message);
+    }
   };
 
-  if (loading) return <div className="p-4">Loading...</div>;
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Will be redirected by useEffect
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">

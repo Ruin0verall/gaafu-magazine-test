@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Category, CategoryData, categoryLabels } from "@/lib/types";
-import { getApiUrl } from "@/lib/config";
-
-const API_URL = getApiUrl();
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ArticleFormData {
   title: string;
   content: string;
   excerpt?: string;
   category_id: string;
+  author_name: string;
   image?: File;
 }
 
 const ArticleEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [categories, setCategories] = useState<CategoryData[]>([]);
@@ -24,32 +25,37 @@ const ArticleEditor: React.FC = () => {
     content: "",
     excerpt: "",
     category_id: "",
+    author_name: "",
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    if (!token) {
+    console.log("ArticleEditor mount - Auth state:", { user, authLoading });
+
+    if (!authLoading && !user) {
+      console.log("No user found, redirecting to login");
       navigate("/admin/login");
       return;
     }
-    fetchCategories();
-    if (id) {
-      fetchArticle(id);
+
+    if (user) {
+      console.log("User found, fetching data");
+      fetchCategories();
+      if (id) {
+        fetchArticle(id);
+      }
     }
-  }, [id, navigate]);
+  }, [id, navigate, user, authLoading]);
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${API_URL}/categories`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok)
-        throw new Error(data.error || "Failed to fetch categories");
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .order("id");
+
+      if (error) throw error;
       setCategories(data);
     } catch (err: any) {
       setError(err.message);
@@ -59,20 +65,22 @@ const ArticleEditor: React.FC = () => {
 
   const fetchArticle = async (articleId: string) => {
     try {
-      const response = await fetch(`${API_URL}/articles/${articleId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok)
-        throw new Error(data.error || "Failed to fetch article");
+      const { data, error } = await supabase
+        .from("articles")
+        .select("*")
+        .eq("id", articleId)
+        .single();
+
+      if (error) throw error;
+
       setFormData({
         title: data.title,
         content: data.content,
         excerpt: data.excerpt || "",
         category_id: data.category_id,
+        author_name: data.author_name || "",
       });
+
       if (data.image_url) {
         setImagePreview(data.image_url);
       }
@@ -108,60 +116,67 @@ const ArticleEditor: React.FC = () => {
     setUploadProgress(0);
 
     try {
+      if (!user)
+        throw new Error("You must be logged in to perform this action");
+
       // Validate required fields
       if (
         !formData.title.trim() ||
         !formData.content.trim() ||
-        !formData.category_id
+        !formData.category_id ||
+        !formData.author_name.trim()
       ) {
         throw new Error("Please fill in all required fields");
       }
 
-      const formDataToSend = new FormData();
-      formDataToSend.append("title", formData.title.trim());
-      formDataToSend.append("content", formData.content.trim());
-      formDataToSend.append("category_id", formData.category_id);
-
-      if (formData.excerpt?.trim()) {
-        formDataToSend.append("excerpt", formData.excerpt.trim());
-      }
-
+      let imageUrl = null;
       if (formData.image) {
         if (!validateImage(formData.image)) {
           setLoading(false);
           return;
         }
-        formDataToSend.append("image", formData.image);
+
+        // Upload image to Supabase Storage
+        const fileExt = formData.image.name.split(".").pop();
+        const fileName = `${Math.random()
+          .toString(36)
+          .substring(2)}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("article-images")
+          .upload(fileName, formData.image);
+
+        if (uploadError) throw uploadError;
+
+        // Get public URL for the uploaded image
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("article-images").getPublicUrl(fileName);
+
+        imageUrl = publicUrl;
       }
 
-      const url = id ? `${API_URL}/articles/${id}` : `${API_URL}/articles`;
-      const method = id ? "PUT" : "POST";
+      const articleData = {
+        title: formData.title.trim(),
+        content: formData.content.trim(),
+        excerpt: formData.excerpt?.trim(),
+        category_id: formData.category_id,
+        author_name: formData.author_name.trim(),
+        image_url: imageUrl,
+      };
 
-      console.log(`Submitting article ${method} request to ${url}`);
-      if (formData.image) {
-        console.log("Image included in submission:", {
-          name: formData.image.name,
-          type: formData.image.type,
-          size: formData.image.size,
-        });
+      let response;
+      if (id) {
+        response = await supabase
+          .from("articles")
+          .update(articleData)
+          .eq("id", id);
+      } else {
+        response = await supabase.from("articles").insert([articleData]);
       }
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        },
-        body: formDataToSend,
-      });
+      if (response.error) throw response.error;
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("Server error response:", data);
-        throw new Error(data.error || data.details || "Failed to save article");
-      }
-
-      console.log("Article saved successfully:", data);
+      console.log("Article saved successfully");
       navigate("/admin/dashboard");
     } catch (err: any) {
       console.error("Error saving article:", err);
@@ -277,6 +292,29 @@ const ArticleEditor: React.FC = () => {
                       value={formData.content}
                       onChange={(e) =>
                         setFormData({ ...formData, content: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="author_name"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Author Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="author_name"
+                      id="author_name"
+                      required
+                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      value={formData.author_name}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          author_name: e.target.value,
+                        })
                       }
                     />
                   </div>
