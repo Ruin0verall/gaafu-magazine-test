@@ -6,6 +6,15 @@ import { getApiUrl } from "@/lib/config";
 const API_URL = getApiUrl();
 const ARTICLES_PER_PAGE = 10;
 
+// Common fetch options for all API calls
+const fetchOptions: RequestInit = {
+  credentials: "include",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  mode: "cors",
+};
+
 export function useArticles(page = 1) {
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -15,11 +24,14 @@ export function useArticles(page = 1) {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await fetch(`${API_URL}/articles`);
+        const response = await fetch(`${API_URL}/articles`, fetchOptions);
         if (!response.ok) {
-          throw new Error("Failed to fetch articles");
+          throw new Error(
+            `Failed to fetch articles: ${response.status} ${response.statusText}`
+          );
         }
         const data = await response.json();
+        console.log("Fetched articles:", data);
         setArticles(data);
         setTotalCount(data.length);
         setIsLoading(false);
@@ -59,20 +71,16 @@ export function useArticlesByCategory(category: Category | "all", page = 1) {
           return;
         }
 
-        // Fetch all articles and filter by category
-        const response = await fetch(`${API_URL}/articles`);
+        const response = await fetch(`${API_URL}/articles`, fetchOptions);
         if (!response.ok) {
-          throw new Error("Failed to fetch articles");
+          throw new Error(
+            `Failed to fetch articles: ${response.status} ${response.statusText}`
+          );
         }
         const data = await response.json();
+        console.log("All articles data:", data);
 
-        // Log the first article to see its structure
-        console.log("Sample article data:", data[0]);
-
-        // Get category ID
         const categoryId = getCategoryId(category);
-
-        // Filter articles by category
         const filteredArticles = data.filter(
           (article: Article) => article.category_id === categoryId
         );
@@ -82,7 +90,6 @@ export function useArticlesByCategory(category: Category | "all", page = 1) {
           categoryId,
           totalArticles: data.length,
           filteredCount: filteredArticles.length,
-          sampleArticle: data[0],
         });
 
         setArticles(filteredArticles);
@@ -129,12 +136,14 @@ export function useArticleById(id: string) {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const response = await fetch(`${API_URL}/articles/${id}`);
+        const response = await fetch(`${API_URL}/articles/${id}`, fetchOptions);
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error("Article not found");
           }
-          throw new Error("Failed to fetch article");
+          throw new Error(
+            `Failed to fetch article: ${response.status} ${response.statusText}`
+          );
         }
         const data = await response.json();
         setArticle(data);
@@ -162,13 +171,14 @@ export function useFeaturedArticle() {
   useEffect(() => {
     const fetchFeaturedArticle = async () => {
       try {
-        // Get all articles and use the first one (most recent)
-        const response = await fetch(`${API_URL}/articles`);
+        const response = await fetch(`${API_URL}/articles`, fetchOptions);
         if (!response.ok) {
-          throw new Error("Failed to fetch featured article");
+          throw new Error(
+            `Failed to fetch featured article: ${response.status} ${response.statusText}`
+          );
         }
         const data = await response.json();
-        // Get the first article as featured
+        console.log("Featured article data:", data);
         setArticle(data[0] || null);
         setIsLoading(false);
       } catch (err) {
