@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Article {
   id: string;
@@ -14,15 +14,13 @@ interface Article {
 const AdminDashboard: React.FC = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
+    const token = localStorage.getItem('adminToken');
     if (!token) {
-      navigate("/admin/login");
+      navigate('/admin/login');
       return;
     }
     fetchArticles();
@@ -30,9 +28,9 @@ const AdminDashboard: React.FC = () => {
 
   const fetchArticles = async () => {
     try {
-      const response = await fetch(`${API_URL}/articles`, {
+      const response = await fetch('http://localhost:5000/api/articles', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
         },
       });
       const data = await response.json();
@@ -46,14 +44,13 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this article?"))
-      return;
+    if (!window.confirm('Are you sure you want to delete this article?')) return;
 
     try {
-      const response = await fetch(`${API_URL}/articles/${id}`, {
-        method: "DELETE",
+      const response = await fetch(`http://localhost:5000/api/articles/${id}`, {
+        method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
         },
       });
 
@@ -62,16 +59,16 @@ const AdminDashboard: React.FC = () => {
         throw new Error(data.error);
       }
 
-      setArticles(articles.filter((article) => article.id !== id));
+      setArticles(articles.filter(article => article.id !== id));
     } catch (err: any) {
       setError(err.message);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminUser");
-    navigate("/admin/login");
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
+    navigate('/admin/login');
   };
 
   if (loading) return <div className="p-4">Loading...</div>;
@@ -86,7 +83,7 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => navigate("/admin/articles/new")}
+                onClick={() => navigate('/admin/articles/new')}
                 className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium"
               >
                 New Article
@@ -107,16 +104,8 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
             <div className="flex">
               <div className="flex-shrink-0">
-                <svg
-                  className="h-5 w-5 text-red-400"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  />
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
               </div>
               <div className="ml-3">
@@ -137,15 +126,12 @@ const AdminDashboard: React.FC = () => {
                         {article.title}
                       </h3>
                       <p className="mt-1 text-sm text-gray-500">
-                        {article.excerpt ||
-                          article.content.substring(0, 100) + "..."}
+                        {article.excerpt || article.content.substring(0, 100) + '...'}
                       </p>
                     </div>
                     <div className="flex space-x-4">
                       <button
-                        onClick={() =>
-                          navigate(`/admin/articles/edit/${article.id}`)
-                        }
+                        onClick={() => navigate(`/admin/articles/edit/${article.id}`)}
                         className="text-indigo-600 hover:text-indigo-900"
                       >
                         Edit
@@ -168,4 +154,4 @@ const AdminDashboard: React.FC = () => {
   );
 };
 
-export default AdminDashboard;
+export default AdminDashboard; 

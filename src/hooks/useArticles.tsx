@@ -1,57 +1,36 @@
-import { useQuery } from "@tanstack/react-query";
-import { getApiUrl } from "@/lib/config";
 import { useState, useEffect } from "react";
 import { Article, Category } from "@/lib/types";
 
-export const useArticles = () => {
-  const fetchArticles = async (): Promise<Article[]> => {
-    try {
-      const response = await fetch(`${getApiUrl()}/articles`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch articles");
+const API_URL = "http://localhost:5000/api";
+
+export function useArticles() {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const response = await fetch(`${API_URL}/articles`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch articles");
+        }
+        const data = await response.json();
+        setArticles(data);
+        setIsLoading(false);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err : new Error("Failed to fetch articles")
+        );
+        setIsLoading(false);
       }
-      return response.json();
-    } catch (error) {
-      console.error("Error fetching articles:", error);
-      throw error;
-    }
-  };
+    };
 
-  return useQuery<Article[]>({
-    queryKey: ["articles"],
-    queryFn: fetchArticles,
-  });
-};
+    fetchArticles();
+  }, []);
 
-export const useFeaturedArticle = () => {
-  const { data: articles, ...rest } = useArticles();
-
-  return {
-    article: articles?.[0],
-    ...rest,
-  };
-};
-
-export const useArticle = (id: string) => {
-  const fetchArticle = async (): Promise<Article> => {
-    try {
-      const response = await fetch(`${getApiUrl()}/articles/${id}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch article");
-      }
-      return response.json();
-    } catch (error) {
-      console.error("Error fetching article:", error);
-      throw error;
-    }
-  };
-
-  return useQuery<Article>({
-    queryKey: ["article", id],
-    queryFn: fetchArticle,
-    enabled: !!id,
-  });
-};
+  return { articles, isLoading, error };
+}
 
 export function useArticlesByCategory(category: Category) {
   const { articles, isLoading, error } = useArticles();
@@ -86,7 +65,7 @@ export function useArticleById(id: string) {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const response = await fetch(`${getApiUrl()}/articles/${id}`);
+        const response = await fetch(`${API_URL}/articles/${id}`);
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error("Article not found");
@@ -108,4 +87,11 @@ export function useArticleById(id: string) {
   }, [id]);
 
   return { article, isLoading, error };
+}
+
+export function useFeaturedArticle() {
+  const { articles, isLoading, error } = useArticles();
+  const featuredArticle = articles[0] || null; // Get the most recent article as featured
+
+  return { article: featuredArticle, isLoading, error };
 }
