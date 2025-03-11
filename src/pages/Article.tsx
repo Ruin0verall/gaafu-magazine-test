@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Calendar, User, Share2 } from "lucide-react";
 import { categoryColors, categoryLabels } from "@/lib/types";
+import { formatDate } from "@/lib/utils";
 
 const Article = () => {
   const { id } = useParams<{ id: string }>();
@@ -95,7 +96,7 @@ const Article = () => {
               )}
               <div className="flex items-center">
                 <Calendar className="h-4 w-4 ml-1" />
-                <span className="mr-1">{article.created_at}</span>
+                <span className="mr-1">{formatDate(article.created_at)}</span>
               </div>
             </div>
 

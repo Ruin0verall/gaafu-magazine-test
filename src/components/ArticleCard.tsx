@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Article, categoryColors, categoryLabels } from "@/lib/types";
 import { Calendar } from "lucide-react";
+import { formatDate } from "@/lib/utils";
 
 interface ArticleCardProps {
   article: Article;
@@ -69,9 +70,9 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
 
         <div className="flex items-center justify-between text-sm text-gaafu-foreground/60">
           {author && <span>{author}</span>}
-          <div className="flex items-center">
-            <Calendar className="h-4 w-4 ml-1" />
-            <span className="mr-1">{created_at}</span>
+          <div className="flex items-center gap-1">
+            <Calendar className="h-4 w-4" />
+            <span>{formatDate(created_at)}</span>
           </div>
         </div>
       </div>
