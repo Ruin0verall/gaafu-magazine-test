@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Article, Category } from "@/lib/types";
+import { getApiUrl } from "@/lib/config";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = getApiUrl();
 
 export function useArticles() {
   const [articles, setArticles] = useState<Article[]>([]);

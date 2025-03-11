@@ -18,6 +18,12 @@ export type Category =
   | "technology"
   | "health";
 
+export interface CategoryData {
+  id: number;
+  name: string;
+  slug: Category;
+}
+
 export const categoryLabels: Record<Category, string> = {
   politics: "ސިޔާސީ",
   business: "ވިޔަފާރި",
