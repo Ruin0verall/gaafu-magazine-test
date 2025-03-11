@@ -33,6 +33,11 @@ async function fetchArticlesWithCache(): Promise<Article[]> {
     );
   }
   const data = await response.json();
+  console.log("API Response Data:", {
+    firstArticle: data[0],
+    authorField: data[0]?.author,
+    totalArticles: data.length,
+  });
   articlesCache = data;
   lastFetchTime = now;
   return data;

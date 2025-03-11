@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Article, categoryColors, categoryLabels } from "@/lib/types";
-import { Calendar } from "lucide-react";
+import { Calendar, User } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 interface ArticleCardProps {
@@ -9,8 +9,19 @@ interface ArticleCardProps {
 }
 
 const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
-  const { id, title, excerpt, image_url, author, created_at, category } =
-    article;
+  const {
+    id,
+    title,
+    excerpt,
+    image_url,
+    author,
+    author_name,
+    created_at,
+    category,
+  } = article;
+
+  // Debug log to check article data
+  console.log("ArticleCard data:", { id, title, author, author_name });
 
   return (
     <div
@@ -69,7 +80,12 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
         )}
 
         <div className="flex items-center justify-between text-sm text-gaafu-foreground/60">
-          {author && <span>{author}</span>}
+          {(author || author_name) && (
+            <div className="flex items-center gap-1">
+              <User className="h-4 w-4" />
+              <span>{author || author_name}</span>
+            </div>
+          )}
           <div className="flex items-center gap-1">
             <Calendar className="h-4 w-4" />
             <span>{formatDate(created_at)}</span>

@@ -7,6 +7,7 @@ export interface Article {
   created_at: string;
   excerpt?: string;
   author?: string;
+  author_name?: string;
   category?: Category;
   isFeatured?: boolean;
 }

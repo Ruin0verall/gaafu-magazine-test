@@ -88,15 +88,15 @@ const Article = () => {
 
             {/* Article Meta */}
             <div className="flex items-center justify-between text-gaafu-foreground/60 mb-8 text-sm">
-              {article.author && (
-                <div className="flex items-center">
-                  <User className="h-4 w-4 ml-1" />
-                  <span className="mr-1">{article.author}</span>
+              {(article.author || article.author_name) && (
+                <div className="flex items-center gap-1">
+                  <User className="h-4 w-4" />
+                  <span>{article.author || article.author_name}</span>
                 </div>
               )}
-              <div className="flex items-center">
-                <Calendar className="h-4 w-4 ml-1" />
-                <span className="mr-1">{formatDate(article.created_at)}</span>
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                <span>{formatDate(article.created_at)}</span>
               </div>
             </div>
 
