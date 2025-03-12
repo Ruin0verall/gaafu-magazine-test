@@ -17,7 +17,9 @@ export type Category =
   | "business"
   | "sports"
   | "technology"
-  | "health";
+  | "health"
+  | "world"
+  | "habaru";
 
 export interface CategoryData {
   id: number;
@@ -31,6 +33,8 @@ export const categoryLabels: Record<Category, string> = {
   sports: "ކުޅިވަރު",
   technology: "ޓެކްނޮލޮޖީ",
   health: "ސިއްހަތު",
+  world: "ދުނިޔެ",
+  habaru: "ޚަބަރު",
 };
 
 export const categoryColors: Record<Category, string> = {
@@ -39,6 +43,8 @@ export const categoryColors: Record<Category, string> = {
   sports: "bg-yellow-100 text-yellow-800",
   technology: "bg-purple-100 text-purple-800",
   health: "bg-red-100 text-red-800",
+  world: "bg-indigo-100 text-indigo-800",
+  habaru: "bg-orange-100 text-orange-800",
 };
 
 // Mock data until Supabase connection is set up
