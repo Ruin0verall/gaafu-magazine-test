@@ -50,12 +50,15 @@ const ArticleEditor: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
+      console.log("Fetching categories...");
       const { data, error } = await supabase
         .from("categories")
         .select("*")
         .order("id");
 
       if (error) throw error;
+
+      console.log("Fetched categories data:", data);
       setCategories(data);
     } catch (err: any) {
       setError(err.message);
@@ -332,19 +335,23 @@ const ArticleEditor: React.FC = () => {
                       required
                       className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       value={formData.category_id}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        console.log("Selected category:", e.target.value);
                         setFormData({
                           ...formData,
                           category_id: e.target.value,
-                        })
-                      }
+                        });
+                      }}
                     >
                       <option value="">Select a category</option>
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.id}>
-                          {categoryLabels[category.slug]}
-                        </option>
-                      ))}
+                      {categories.map((category) => {
+                        console.log("Rendering category:", category);
+                        return (
+                          <option key={category.id} value={category.id}>
+                            {category.name || categoryLabels[category.slug] || "Unknown Category"}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
 
