@@ -18,9 +18,9 @@ const Category = () => {
       <div className="min-h-screen">
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16 text-center">
-          <h1 className="text-2xl font-bold mb-4">ކެޓަގަރީ ނުފެނުނު</h1>
-          <p className="mb-6">ކެޓަގަރީ ލިބެން ނެތް ނުވަތަ ކުށެއް ދިމާވެއްޖެ</p>
-          <Link to="/" className="text-gaafu-accent hover:text-gaafu-highlight">
+          <h1 className="text-2xl font-bold mb-4 font-dhivehi">ކެޓަގަރީ ނުފެނުނު</h1>
+          <p className="mb-6 font-dhivehi">ކެޓަގަރީ ލިބެން ނެތް ނުވަތަ ކުށެއް ދިމާވެއްޖެ</p>
+          <Link to="/" className="text-gaafu-accent hover:text-gaafu-highlight font-dhivehi">
             މައި ސަފްޙާއަށް ދާންވީތަ؟
           </Link>
         </div>
@@ -44,9 +44,9 @@ const Category = () => {
       <div className="min-h-screen">
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16 text-center">
-          <h1 className="text-2xl font-bold mb-4">ކުށެއް ދިމާވެއްޖެ</h1>
-          <p className="mb-6">މަޢުލޫމާތު ހޯދުމުގައި މައްސަލައެއް ދިމާވެއްޖެ</p>
-          <Link to="/" className="text-gaafu-accent hover:text-gaafu-highlight">
+          <h1 className="text-2xl font-bold mb-4 font-dhivehi">ކުށެއް ދިމާވެއްޖެ</h1>
+          <p className="mb-6 font-dhivehi">މަޢުލޫމާތު ހޯދުމުގައި މައްސަލައެއް ދިމާވެއްޖެ</p>
+          <Link to="/" className="text-gaafu-accent hover:text-gaafu-highlight font-dhivehi">
             މައި ސަފްޙާއަށް ދާންވީތަ؟
           </Link>
         </div>

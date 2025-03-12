@@ -87,16 +87,16 @@ const Article = () => {
             </h1>
 
             {/* Article Meta */}
-            <div className="flex items-center justify-between text-gaafu-foreground/60 mb-8 text-sm">
+            <div className="flex items-center justify-between text-gaafu-foreground/60 mb-8 text-sm font-dhivehi">
               {(article.author || article.author_name) && (
                 <div className="flex items-center gap-1">
                   <User className="h-4 w-4" />
-                  <span>{article.author || article.author_name}</span>
+                  <span className="font-dhivehi">{article.author || article.author_name}</span>
                 </div>
               )}
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                <span>{formatDate(article.created_at)}</span>
+                <span className="font-dhivehi">{formatDate(article.created_at)}</span>
               </div>
             </div>
 
@@ -110,14 +110,14 @@ const Article = () => {
             </div>
 
             {/* Content */}
-            <div className="prose prose-lg max-w-none">
+            <div className="prose prose-lg max-w-none font-dhivehi">
               {/* Excerpt as intro paragraph */}
               {article.excerpt && (
-                <p className="font-medium text-xl">{article.excerpt}</p>
+                <p className="font-medium text-xl font-dhivehi">{article.excerpt}</p>
               )}
 
               {/* Main content */}
-              <div className="mt-6">{article.content}</div>
+              <div className="mt-6 font-dhivehi">{article.content}</div>
             </div>
 
             {/* Share */}

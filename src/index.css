@@ -2,15 +2,23 @@
 /* Custom Dhivehi font imports */
 @font-face {
   font-family: "MV-Waheed";
-  src: url("public/fonts/MVWaheed.ttf") format("truetype");
+  src: url("/fonts/MVWaheed.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Faseyha";
-  src: url("public/fonts/Faruma.ttf") format("truetype");
+  font-family: "Faruma";
+  src: url("/fonts/Faruma.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "faruma";
+  src: url("/fonts/Faruma.TTF") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;

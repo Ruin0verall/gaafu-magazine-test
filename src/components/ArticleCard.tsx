@@ -65,7 +65,7 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
       >
         <Link to={`/article/${id}`}>
           <h3
-            className={`font-bold text-gaafu-foreground group-hover:text-gaafu-teal transition-colors ${
+            className={`font-bold text-gaafu-foreground group-hover:text-gaafu-teal transition-colors font-dhivehi ${
               featured ? "text-xl md:text-2xl mb-3" : "text-lg mb-2"
             }`}
           >
@@ -74,7 +74,7 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
         </Link>
 
         {excerpt && (
-          <p className="text-gaafu-foreground/80 mb-4 line-clamp-2">
+          <p className="text-gaafu-foreground/80 mb-4 line-clamp-2 font-dhivehi">
             {excerpt}
           </p>
         )}
