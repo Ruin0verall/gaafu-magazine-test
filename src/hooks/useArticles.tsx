@@ -173,10 +173,14 @@ export function useArticleById(id: string) {
 
     const fetchArticle = async () => {
       try {
+        console.log('Fetching article with ID:', id);
+        console.log('API URL:', `${API_URL}/articles/${id}`);
+        
         // Check cache first
         if (articlesCache) {
           const cachedArticle = articlesCache.find((a) => String(a.id) === id);
           if (cachedArticle && isMounted) {
+            console.log('Found article in cache:', cachedArticle);
             setArticle(cachedArticle);
             setIsLoading(false);
             return;
@@ -184,15 +188,25 @@ export function useArticleById(id: string) {
         }
 
         const response = await fetch(`${API_URL}/articles/${id}`, fetchOptions);
+        console.log('API Response:', {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries())
+        });
+
         if (!response.ok) {
           if (response.status === 404) {
+            console.log('Article not found in database');
             throw new Error("Article not found");
           }
           throw new Error(
             `Failed to fetch article: ${response.status} ${response.statusText}`
           );
         }
+        
         const data = await response.json();
+        console.log('Article data received:', data);
+        
         if (isMounted) {
           setArticle(data);
           setIsLoading(false);
