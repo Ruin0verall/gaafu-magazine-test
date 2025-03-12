@@ -33,14 +33,42 @@ async function fetchArticlesWithCache(): Promise<Article[]> {
     );
   }
   const data = await response.json();
-  console.log("API Response Data:", {
-    firstArticle: data[0],
-    authorField: data[0]?.author,
-    totalArticles: data.length,
+  
+  // Map category_id to category name
+  const articlesWithCategories = data.map((article: Article) => {
+    let category: Category | undefined;
+    switch (article.category_id) {
+      case 1:
+        category = "politics";
+        break;
+      case 2:
+        category = "business";
+        break;
+      case 3:
+        category = "sports";
+        break;
+      case 4:
+        category = "technology";
+        break;
+      case 5:
+        category = "health";
+        break;
+    }
+    return {
+      ...article,
+      category
+    };
   });
-  articlesCache = data;
+
+  console.log("API Response Data with categories:", {
+    firstArticle: articlesWithCategories[0],
+    category: articlesWithCategories[0]?.category,
+    totalArticles: articlesWithCategories.length,
+  });
+
+  articlesCache = articlesWithCategories;
   lastFetchTime = now;
-  return data;
+  return articlesWithCategories;
 }
 
 export function useArticles(page = 1) {

@@ -21,7 +21,7 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
   } = article;
 
   // Debug log to check article data
-  console.log("ArticleCard data:", { id, title, author, author_name });
+  console.log("ArticleCard render:", { id, title, category });
 
   return (
     <div
@@ -47,8 +47,8 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
         </Link>
         {category && (
           <div
-            className={`absolute top-3 right-3 ${categoryColors[category]} 
-              category-label opacity-90 backdrop-blur-sm`}
+            className={`absolute top-4 right-4 z-10 py-1.5 px-4 rounded-full text-sm font-medium 
+              shadow-lg backdrop-blur-sm font-dhivehi ${categoryColors[category]}`}
           >
             {categoryLabels[category]}
           </div>

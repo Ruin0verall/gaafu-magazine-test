@@ -27,7 +27,7 @@ const FeaturedArticle = ({ article }: FeaturedArticleProps) => {
           <div className="max-w-3xl mx-auto text-center">
             <div
               className={`inline-block mb-5 ${categoryColors[category]} 
-                py-1.5 px-4 rounded-full text-sm font-medium shadow-sm`}
+                py-1.5 px-4 rounded-full text-sm font-medium shadow-sm font-dhivehi`}
             >
               {categoryLabels[category]}
             </div>
