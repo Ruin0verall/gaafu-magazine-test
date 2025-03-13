@@ -123,16 +123,21 @@ const Index = () => {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                  {articles.map((article) => (
+                  {articles?.map((article) => (
                     <ArticleCard key={article.id} article={article} />
                   ))}
                 </div>
 
-                {articles.length === 0 && (
+                {(!articles || articles.length === 0) && (
                   <div className="text-center py-16 rounded-xl bg-gaafu-muted/50 my-8">
                     <p className="text-gaafu-foreground/60 font-dhivehi text-lg">
                       މި ބަޔަށް ނިއުސް ނެތް
                     </p>
+                    {featuredError && (
+                      <p className="text-red-500 mt-2">
+                        Error loading articles. Please try again later.
+                      </p>
+                    )}
                   </div>
                 )}
               </>

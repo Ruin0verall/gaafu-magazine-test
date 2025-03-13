@@ -27,53 +27,65 @@ async function fetchArticlesWithCache(): Promise<Article[]> {
     return articlesCache;
   }
 
-  const response = await fetch(`${API_URL}/articles`, fetchOptions);
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch articles: ${response.status} ${response.statusText}`
-    );
-  }
-  const data = await response.json();
-  console.log("Raw data from API:", data);
-  
-  // Map category_id to category name
-  const articlesWithCategories = data.map((article: Article) => {
-    let category: Category | undefined;
-    switch (article.category_id) {
-      case 1:
-        category = "politics";
-        break;
-      case 2:
-        category = "business";
-        break;
-      case 3:
-        category = "sports";
-        break;
-      case 4:
-        category = "technology";
-        break;
-      case 5:
-        category = "health";
-        break;
-      case 6:
-        category = "world";
-        break;
-      case 7:
-        category = "habaru";
-        break;
+  try {
+    const response = await fetch(`${API_URL}/articles`, fetchOptions);
+    if (!response.ok) {
+      console.error(`API Error: ${response.status} ${response.statusText}`);
+      return []; // Return empty array instead of throwing
     }
-    console.log(`Mapping article ${article.id}: category_id=${article.category_id} -> category=${category}`);
-    return {
-      ...article,
-      category
-    };
-  });
 
-  console.log("Mapped articles with categories:", articlesWithCategories);
+    const data = await response.json();
+    console.log("Raw data from API:", data);
 
-  articlesCache = articlesWithCategories;
-  lastFetchTime = now;
-  return articlesWithCategories;
+    if (!Array.isArray(data)) {
+      console.error("API returned non-array data:", data);
+      return [];
+    }
+
+    // Map category_id to category name
+    const articlesWithCategories = data.map((article: Article) => {
+      let category: Category | undefined;
+      switch (article.category_id) {
+        case 1:
+          category = "politics";
+          break;
+        case 2:
+          category = "business";
+          break;
+        case 3:
+          category = "sports";
+          break;
+        case 4:
+          category = "technology";
+          break;
+        case 5:
+          category = "health";
+          break;
+        case 6:
+          category = "world";
+          break;
+        case 7:
+          category = "habaru";
+          break;
+      }
+      console.log(
+        `Mapping article ${article.id}: category_id=${article.category_id} -> category=${category}`
+      );
+      return {
+        ...article,
+        category,
+      };
+    });
+
+    console.log("Mapped articles with categories:", articlesWithCategories);
+
+    articlesCache = articlesWithCategories;
+    lastFetchTime = now;
+    return articlesWithCategories;
+  } catch (err) {
+    console.error("Error fetching articles:", err);
+    return [];
+  }
 }
 
 export function useArticles(page = 1) {
@@ -132,7 +144,7 @@ export function useArticlesByCategory(category: Category | "all", page = 1) {
     const fetchArticlesByCategory = async () => {
       try {
         console.log("Fetching articles for category:", category);
-        
+
         if (category === "all") {
           if (isMounted) {
             setArticles([]);
@@ -147,20 +159,20 @@ export function useArticlesByCategory(category: Category | "all", page = 1) {
         const categoryId = getCategoryId(category);
         console.log("Category ID for filtering:", categoryId);
         console.log("Available articles before filtering:", data);
-        
-        const filteredArticles = data.filter(
-          (article: Article) => {
-            console.log(`Checking article ${article.id}: category_id=${article.category_id} against ${categoryId}`);
-            return article.category_id === categoryId;
-          }
-        );
+
+        const filteredArticles = data.filter((article: Article) => {
+          console.log(
+            `Checking article ${article.id}: category_id=${article.category_id} against ${categoryId}`
+          );
+          return article.category_id === categoryId;
+        });
 
         console.log("Category filtering results:", {
           category,
           categoryId,
           totalArticles: data.length,
           filteredCount: filteredArticles.length,
-          filteredArticles
+          filteredArticles,
         });
 
         setArticles(filteredArticles);
@@ -217,14 +229,14 @@ export function useArticleById(id: string) {
 
     const fetchArticle = async () => {
       try {
-        console.log('Fetching article with ID:', id);
-        console.log('API URL:', `${API_URL}/articles/${id}`);
-        
+        console.log("Fetching article with ID:", id);
+        console.log("API URL:", `${API_URL}/articles/${id}`);
+
         // Check cache first
         if (articlesCache) {
           const cachedArticle = articlesCache.find((a) => String(a.id) === id);
           if (cachedArticle && isMounted) {
-            console.log('Found article in cache:', cachedArticle);
+            console.log("Found article in cache:", cachedArticle);
             setArticle(cachedArticle);
             setIsLoading(false);
             return;
@@ -232,25 +244,25 @@ export function useArticleById(id: string) {
         }
 
         const response = await fetch(`${API_URL}/articles/${id}`, fetchOptions);
-        console.log('API Response:', {
+        console.log("API Response:", {
           status: response.status,
           statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries())
+          headers: Object.fromEntries(response.headers.entries()),
         });
 
         if (!response.ok) {
           if (response.status === 404) {
-            console.log('Article not found in database');
+            console.log("Article not found in database");
             throw new Error("Article not found");
           }
           throw new Error(
             `Failed to fetch article: ${response.status} ${response.statusText}`
           );
         }
-        
+
         const data = await response.json();
-        console.log('Article data received:', data);
-        
+        console.log("Article data received:", data);
+
         if (isMounted) {
           setArticle(data);
           setIsLoading(false);
