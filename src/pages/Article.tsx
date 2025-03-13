@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { Calendar, User, Share2 } from "lucide-react";
 import { categoryColors, categoryLabels } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
+import { Helmet } from "react-helmet";
 
 const Article = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,9 +18,34 @@ const Article = () => {
     setIsVisible(true);
   }, []);
 
+  // Function to prepare OG data
+  const getOgData = (article: any) => {
+    const baseUrl = window.location.origin;
+    const currentUrl = `${baseUrl}/article/${id}`;
+
+    return {
+      title: article.title,
+      description:
+        article.excerpt || article.content?.substring(0, 160) + "...",
+      image: article.image_url?.startsWith("http")
+        ? article.image_url
+        : `${baseUrl}${article.image_url}`,
+      url: currentUrl,
+      type: "article",
+      siteName: "Gaafu Magazine",
+      locale: "dv_MV",
+      author: article.author || article.author_name,
+      publishedTime: article.created_at,
+      section: article.category ? categoryLabels[article.category] : undefined,
+    };
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen">
+        <Helmet>
+          <title>Loading... | Gaafu Magazine</title>
+        </Helmet>
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16">
           <div className="max-w-3xl mx-auto">
@@ -38,6 +64,13 @@ const Article = () => {
   if (error || !article) {
     return (
       <div className="min-h-screen">
+        <Helmet>
+          <title>Article Not Found | Gaafu Magazine</title>
+          <meta
+            name="description"
+            content="The requested article could not be found."
+          />
+        </Helmet>
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16 text-center">
           <h1 className="text-2xl font-bold mb-4 font-dhivehi">
@@ -56,12 +89,49 @@ const Article = () => {
     );
   }
 
+  const ogData = getOgData(article);
+
   return (
     <div
       className={`min-h-screen transition-opacity duration-500 ${
         isVisible ? "opacity-100" : "opacity-0"
       }`}
     >
+      <Helmet>
+        {/* Primary Meta Tags */}
+        <title>{ogData.title} | Gaafu Magazine</title>
+        <meta name="description" content={ogData.description} />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content={ogData.type} />
+        <meta property="og:url" content={ogData.url} />
+        <meta property="og:title" content={ogData.title} />
+        <meta property="og:description" content={ogData.description} />
+        <meta property="og:image" content={ogData.image} />
+        <meta property="og:site_name" content={ogData.siteName} />
+        <meta property="og:locale" content={ogData.locale} />
+
+        {/* Article specific */}
+        {ogData.author && (
+          <meta property="article:author" content={ogData.author} />
+        )}
+        {ogData.publishedTime && (
+          <meta
+            property="article:published_time"
+            content={ogData.publishedTime}
+          />
+        )}
+        {ogData.section && (
+          <meta property="article:section" content={ogData.section} />
+        )}
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={ogData.title} />
+        <meta name="twitter:description" content={ogData.description} />
+        <meta name="twitter:image" content={ogData.image} />
+      </Helmet>
+
       <Header />
 
       <main className="pt-32 pb-16">
@@ -91,12 +161,16 @@ const Article = () => {
               {(article.author || article.author_name) && (
                 <div className="flex items-center gap-1">
                   <User className="h-4 w-4" />
-                  <span className="font-dhivehi">{article.author || article.author_name}</span>
+                  <span className="font-dhivehi">
+                    {article.author || article.author_name}
+                  </span>
                 </div>
               )}
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                <span className="font-dhivehi">{formatDate(article.created_at)}</span>
+                <span className="font-dhivehi">
+                  {formatDate(article.created_at)}
+                </span>
               </div>
             </div>
 
@@ -113,7 +187,9 @@ const Article = () => {
             <div className="prose prose-lg max-w-none font-dhivehi">
               {/* Excerpt as intro paragraph */}
               {article.excerpt && (
-                <p className="font-medium text-xl font-dhivehi">{article.excerpt}</p>
+                <p className="font-medium text-xl font-dhivehi">
+                  {article.excerpt}
+                </p>
               )}
 
               {/* Main content */}
