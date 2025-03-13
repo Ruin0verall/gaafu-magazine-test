@@ -1,7 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/article/:path*",
+      "source": "/article/:id",
       "has": [
         {
           "type": "header",
@@ -9,10 +9,10 @@
           "value": ".*facebookexternalhit.*|.*Twitterbot.*|.*LinkedInBot.*|.*WhatsApp.*|.*Slackbot.*|.*TelegramBot.*"
         }
       ],
-      "destination": "https://havaasa-backend-production.up.railway.app/api/articles/:path*"
+      "destination": "https://havaasa-backend-production.up.railway.app/api/articles/:id"
     },
     {
-      "source": "/(.*)",
+      "source": "/article/:id",
       "destination": "/index.html"
     }
   ],
@@ -46,6 +46,13 @@
           "value": "public, max-age=31536000, immutable"
         }
       ]
+    }
+  ],
+  "routes": [
+    {
+      "src": "/article/.*",
+      "dest": "/index.html",
+      "status": 200
     }
   ]
 }
