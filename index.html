@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
     <!--app-head-->
     <title>Gaafu Magazine</title>
     <meta
@@ -18,9 +19,18 @@
       content="ދިވެހިރާއްޖޭގެ އެންމެ ފުރަތަމަ އޮންލައިން މަޖައްލާ"
     />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://gaafu.mv" />
+    <meta
+      property="og:url"
+      content="https://gaafu-magazine-test-eight.vercel.app"
+    />
     <meta property="og:site_name" content="Gaafu Magazine" />
     <meta property="og:locale" content="dv_MV" />
+    <meta
+      property="og:image"
+      content="https://gaafu-magazine-test-eight.vercel.app/og-image.jpg"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
     <!-- Twitter Card tags -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -29,9 +39,18 @@
       name="twitter:description"
       content="ދިވެހިރާއްޖޭގެ އެންމެ ފުރަތަމަ އޮންލައިން މަޖައްލާ"
     />
+    <meta
+      name="twitter:image"
+      content="https://gaafu-magazine-test-eight.vercel.app/og-image.jpg"
+    />
   </head>
 
   <body>
+    <noscript>
+      <div style="text-align: center; padding: 20px">
+        ވެބްސައިޓް ބެލުމަށް ޖާވާސްކްރިޕްޓް އެނެބަލް ކުރައްވާ
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

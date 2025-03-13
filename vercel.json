@@ -10,6 +10,10 @@
         }
       ],
       "destination": "https://havaasa-backend-production.up.railway.app/api/articles/:id"
+    },
+    {
+      "source": "/article/:id",
+      "destination": "/index.html"
     }
   ],
   "headers": [
@@ -35,5 +39,11 @@
       ]
     }
   ],
-  "regions": ["sin1"]
+  "routes": [
+    {
+      "src": "/article/.*",
+      "dest": "/index.html",
+      "status": 200
+    }
+  ]
 }
