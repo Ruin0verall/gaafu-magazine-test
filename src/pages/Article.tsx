@@ -22,9 +22,9 @@ const Article = () => {
   const getOgData = (article: any) => {
     const baseUrl = window.location.origin;
     const currentUrl = `${baseUrl}/article/${id}`;
-    const imageUrl = article.image_url?.startsWith("http")
-      ? article.image_url
-      : `${baseUrl}${article.image_url}`;
+    const defaultImageUrl = `${baseUrl}/og-image.png`;
+
+    const imageUrl = article.image_url || defaultImageUrl;
 
     return {
       title: article.title,

@@ -37,6 +37,15 @@
           "value": "Content-Type, Authorization, User-Agent"
         }
       ]
+    },
+    {
+      "source": "/og-image.png",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }
