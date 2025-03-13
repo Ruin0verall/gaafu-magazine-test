@@ -28,24 +28,32 @@ const MetaTags: React.FC<MetaTagsProps> = ({
 
   const finalTitle = title || defaultTitle;
   const finalDescription = description || defaultDescription;
-  const finalImage = image || defaultImage;
   const finalUrl = url || defaultUrl;
 
   // Ensure image URL is absolute
-  const getAbsoluteUrl = (url: string) => {
+  const getAbsoluteUrl = (url: string | undefined): string => {
+    if (!url) return defaultImage;
+
     try {
+      // If it's already an absolute URL, return it
       if (url.startsWith("http")) return url;
-      // Use window.location.origin for client-side and defaultUrl for SSR
+
+      // If it's a relative URL starting with //, add https:
+      if (url.startsWith("//")) return `https:${url}`;
+
+      // If it's a relative URL, make it absolute
       const baseUrl =
         typeof window !== "undefined" ? window.location.origin : defaultUrl;
-      return new URL(url, baseUrl).toString();
+      // Remove any leading slash to avoid double slashes
+      const cleanUrl = url.startsWith("/") ? url.slice(1) : url;
+      return `${baseUrl}/${cleanUrl}`;
     } catch (e) {
       console.warn("Invalid URL:", url);
       return defaultImage;
     }
   };
 
-  const absoluteImageUrl = getAbsoluteUrl(finalImage);
+  const absoluteImageUrl = getAbsoluteUrl(image);
 
   return (
     <Helmet prioritizeSeoTags>
@@ -61,6 +69,8 @@ const MetaTags: React.FC<MetaTagsProps> = ({
       <meta property="og:title" content={finalTitle} />
       <meta property="og:description" content={finalDescription} />
       <meta property="og:image" content={absoluteImageUrl} />
+      <meta property="og:image:secure_url" content={absoluteImageUrl} />
+      <meta property="og:image:type" content="image/jpeg" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:locale" content="dv_MV" />
