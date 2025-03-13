@@ -29,7 +29,10 @@ const MetaTags: React.FC<MetaTagsProps> = ({
   const getAbsoluteUrl = (url: string) => {
     try {
       if (url.startsWith("http")) return url;
-      return new URL(url, window.location.origin).toString();
+      // Use window.location.origin for client-side and defaultUrl for SSR
+      const baseUrl =
+        typeof window !== "undefined" ? window.location.origin : defaultUrl;
+      return new URL(url, baseUrl).toString();
     } catch (e) {
       console.warn("Invalid URL:", url);
       return defaultImage;
@@ -39,7 +42,7 @@ const MetaTags: React.FC<MetaTagsProps> = ({
   const absoluteImageUrl = getAbsoluteUrl(finalImage);
 
   return (
-    <Helmet>
+    <Helmet prioritizeSeoTags>
       {/* Primary Meta Tags */}
       <title>{finalTitle}</title>
       <meta name="title" content={finalTitle} />
@@ -54,6 +57,9 @@ const MetaTags: React.FC<MetaTagsProps> = ({
       <meta property="og:image" content={absoluteImageUrl} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
+
+      {/* Force meta tags to be in the head */}
+      <meta name="fragment" content="!" />
     </Helmet>
   );
 };
