@@ -13,8 +13,7 @@ import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { HelmetProvider } from "react-helmet-async";
 import "./App.css";
-
-const queryClient = new QueryClient();
+import { queryClient } from "./lib/queryClient";
 
 function App() {
   return (
