@@ -3,6 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Category, CategoryData, categoryLabels } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
+import { Editor } from "@tinymce/tinymce-react";
+
+const TINYMCE_API_KEY = import.meta.env.VITE_TINYMCE_API_KEY;
 
 interface ArticleFormData {
   title: string;
@@ -282,20 +285,97 @@ const ArticleEditor: React.FC = () => {
                   <div>
                     <label
                       htmlFor="content"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-gray-700 mb-2"
                     >
                       Content *
                     </label>
-                    <textarea
+                    <Editor
+                      apiKey={TINYMCE_API_KEY}
                       id="content"
-                      name="content"
-                      rows={10}
-                      required
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                       value={formData.content}
-                      onChange={(e) =>
-                        setFormData({ ...formData, content: e.target.value })
+                      onEditorChange={(content) =>
+                        setFormData({ ...formData, content })
                       }
+                      init={{
+                        height: 500,
+                        menubar: false,
+                        directionality: "rtl",
+                        language: "en",
+                        plugins: [
+                          "advlist",
+                          "autolink",
+                          "lists",
+                          "link",
+                          "image",
+                          "preview",
+                          "anchor",
+                          "searchreplace",
+                          "fullscreen",
+                          "media",
+                          "table",
+                          "help",
+                          "wordcount",
+                        ],
+                        toolbar:
+                          "styles | bold italic | alignright aligncenter alignjustify | bullist numlist | link image",
+                        content_style: `
+                          :root {
+                            --content-font: MV-Waheed, Faruma, sans-serif;
+                          }
+                          body { 
+                            font-family: var(--content-font);
+                            font-size: 18px;
+                            line-height: 2.5;
+                            direction: rtl;
+                            margin: 1rem;
+                          }
+                          p { 
+                            font-family: var(--content-font);
+                            margin: 0 0 1.5rem 0;
+                            text-align: right;
+                            line-height: 2.5;
+                          }
+                          * {
+                            font-family: var(--content-font);
+                          }
+                        `,
+                        formats: {
+                          alignright: {
+                            selector: "p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li",
+                            styles: { "text-align": "right" },
+                          },
+                          aligncenter: {
+                            selector: "p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li",
+                            styles: { "text-align": "center" },
+                          },
+                          alignjustify: {
+                            selector: "p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li",
+                            styles: { "text-align": "justify" },
+                          },
+                        },
+                        style_formats: [
+                          { title: "Paragraph", format: "p" },
+                          { title: "Heading 1", format: "h1" },
+                          { title: "Heading 2", format: "h2" },
+                          { title: "Heading 3", format: "h3" },
+                        ],
+                        valid_elements:
+                          "p,h1,h2,h3,h4,h5,h6,a[href],strong,em,img[src|alt],br,ul,ol,li",
+                        valid_styles: {
+                          "*": "font-family,text-align,line-height",
+                        },
+                        paste_preprocess: function (plugin, args) {
+                          args.content = args.content.replace(
+                            /style="[^"]*"/g,
+                            ""
+                          );
+                        },
+                        setup: function (editor) {
+                          editor.on("BeforeSetContent", function (e) {
+                            e.content = e.content.replace(/style="[^"]*"/g, "");
+                          });
+                        },
+                      }}
                     />
                   </div>
 
@@ -348,7 +428,9 @@ const ArticleEditor: React.FC = () => {
                         console.log("Rendering category:", category);
                         return (
                           <option key={category.id} value={category.id}>
-                            {category.name || categoryLabels[category.slug] || "Unknown Category"}
+                            {category.name ||
+                              categoryLabels[category.slug] ||
+                              "Unknown Category"}
                           </option>
                         );
                       })}

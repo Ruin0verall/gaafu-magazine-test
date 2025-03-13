@@ -134,15 +134,30 @@
 
   /* Article style enhancements */
   .article-content {
-    @apply leading-relaxed space-y-6;
+    @apply leading-relaxed space-y-8;
   }
 
   .article-content p {
-    @apply text-lg;
+    @apply text-xl;
   }
 
   .article-content h2 {
     @apply text-2xl font-semibold mt-8 mb-4;
+  }
+
+  /* Prose customization for Dhivehi text */
+  .prose {
+    @apply text-right space-y-12;
+  }
+
+  .prose p {
+    @apply text-right text-xl leading-[2.5] font-dhivehi text-opacity-90;
+    margin-bottom: 3rem;
+  }
+
+  /* Special styling for numbers within Dhivehi text */
+  .prose p span.number {
+    @apply font-sans text-lg mx-2 inline-block opacity-90;
   }
 
   /* Category label styles */
