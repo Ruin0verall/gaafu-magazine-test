@@ -1,8 +1,30 @@
 {
   "rewrites": [
     {
+      "source": "/article/:id",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*((facebook|twitter|linkedin|pinterest|whatsapp).*|bot|crawler|spider|crawling).*"
+        }
+      ],
+      "destination": "https://havaasa-backend-production.up.railway.app/api/articles/:id"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    }
   ]
-} 
+}

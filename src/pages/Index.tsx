@@ -12,6 +12,7 @@ import {
 } from "@/hooks/useArticles";
 import { Category, categoryLabels } from "@/lib/types";
 import { ChevronRight } from "lucide-react";
+import SEO from "@/components/SEO";
 
 const ArticlesGrid = ({
   articles,
@@ -110,38 +111,11 @@ const Index = () => {
         isVisible ? "opacity-100" : "opacity-0"
       }`}
     >
-      <Helmet>
-        <title>ގާފު މަޖައްލާ - Gaafu Magazine</title>
-        <meta
-          name="description"
-          content="ގާފު އަކީ ދިވެހި ބަހުން ހިންގާ ހަބަރާއި މަޢުލޫމާތު ފޯރުކޮށްދޭ ފަރާތެކެވެ"
-        />
-
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://gaafu.mv/" />
-        <meta property="og:title" content="ގާފު މަޖައްލާ - Gaafu Magazine" />
-        <meta
-          property="og:description"
-          content="ގާފު އަކީ ދިވެހި ބަހުން ހިންގާ ހަބަރާއި މަޢުލޫމާތު ފޯރުކޮށްދޭ ފަރާތެކެވެ"
-        />
-        <meta property="og:image" content="/og-image.png" />
-
-        {/* Twitter */}
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content="https://gaafu.mv/" />
-        <meta
-          property="twitter:title"
-          content="ގާފު މަޖައްލާ - Gaafu Magazine"
-        />
-        <meta
-          property="twitter:description"
-          content="ގާފު އަކީ ދިވެހި ބަހުން ހިންގާ ހަބަރާއި މަޢުލޫމާތު ފޯރުކޮށްދޭ ފަރާތެކެވެ"
-        />
-        <meta property="twitter:image" content="/og-image.png" />
-
-        <link rel="canonical" href="https://gaafu.mv/" />
-      </Helmet>
+      <SEO
+        title="ގާފު މަޖައްލާ"
+        description="ގާފު އަކީ ދިވެހި ބަހުން ހިންގާ ހަބަރާއި މަޢުލޫމާތު ފޯރުކޮށްދޭ ފަރާތެކެވެ"
+        type="website"
+      />
 
       <Header />
 

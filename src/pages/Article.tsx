@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import { useArticleById } from "@/hooks/useArticles";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Calendar, User, Share2 } from "lucide-react";
 import { categoryColors, categoryLabels } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
@@ -24,6 +24,7 @@ const Article = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen">
+        <SEO title="Loading Article" description="Article is loading..." />
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16">
           <div className="max-w-3xl mx-auto">
@@ -42,6 +43,10 @@ const Article = () => {
   if (error || !article) {
     return (
       <div className="min-h-screen">
+        <SEO
+          title="Article Not Found"
+          description="The requested article could not be found."
+        />
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16 text-center">
           <h1 className="text-2xl font-bold mb-4 font-dhivehi">
@@ -68,45 +73,16 @@ const Article = () => {
         isVisible ? "opacity-100" : "opacity-0"
       }`}
     >
-      <Helmet>
-        <title>{article.title} - ގާފު މަޖައްލާ</title>
-        <meta
-          name="description"
-          content={article.excerpt || article.content.substring(0, 160)}
-        />
-
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content={canonicalUrl} />
-        <meta property="og:title" content={article.title} />
-        <meta
-          property="og:description"
-          content={article.excerpt || article.content.substring(0, 160)}
-        />
-        <meta property="og:image" content={article.image_url} />
-
-        {/* Twitter */}
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content={canonicalUrl} />
-        <meta property="twitter:title" content={article.title} />
-        <meta
-          property="twitter:description"
-          content={article.excerpt || article.content.substring(0, 160)}
-        />
-        <meta property="twitter:image" content={article.image_url} />
-
-        {/* Additional Article Meta */}
-        <meta property="article:published_time" content={article.created_at} />
-        <meta
-          property="article:author"
-          content={article.author || article.author_name}
-        />
-        <meta
-          property="article:section"
-          content={categoryLabels[article.category || "habaru"]}
-        />
-        <link rel="canonical" href={canonicalUrl} />
-      </Helmet>
+      <SEO
+        title={article.title}
+        description={article.excerpt || article.content.substring(0, 160)}
+        image={article.image_url}
+        url={canonicalUrl}
+        type="article"
+        publishedTime={article.created_at}
+        author={article.author || article.author_name}
+        section={categoryLabels[article.category || "habaru"]}
+      />
 
       <Header />
 
