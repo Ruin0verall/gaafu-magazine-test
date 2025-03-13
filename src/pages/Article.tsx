@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { Calendar, User, Share2 } from "lucide-react";
 import { categoryColors, categoryLabels } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 const Article = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,7 +32,7 @@ const Article = () => {
         : `${baseUrl}${article.image_url}`,
       url: currentUrl,
       type: "article",
-      siteName: "Gaafu Magazine",
+      site_name: "Gaafu Magazine",
       locale: "dv_MV",
       author: article.author || article.author_name,
       publishedTime: article.created_at,
@@ -45,6 +45,7 @@ const Article = () => {
       <div className="min-h-screen">
         <Helmet>
           <title>Loading... | Gaafu Magazine</title>
+          <meta name="description" content="Loading article..." />
         </Helmet>
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16">
@@ -89,7 +90,7 @@ const Article = () => {
     );
   }
 
-  const ogData = getOgData(article);
+  const og = getOgData(article);
 
   return (
     <div
@@ -98,38 +99,31 @@ const Article = () => {
       }`}
     >
       <Helmet>
-        {/* Primary Meta Tags */}
-        <title>{ogData.title} | Gaafu Magazine</title>
-        <meta name="description" content={ogData.description} />
+        {/* Basic meta tags */}
+        <title>{og.title} | Gaafu Magazine</title>
+        <meta name="description" content={og.description} />
 
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content={ogData.type} />
-        <meta property="og:url" content={ogData.url} />
-        <meta property="og:title" content={ogData.title} />
-        <meta property="og:description" content={ogData.description} />
-        <meta property="og:image" content={ogData.image} />
-        <meta property="og:site_name" content={ogData.siteName} />
-        <meta property="og:locale" content={ogData.locale} />
+        {/* OpenGraph meta tags */}
+        <meta property="og:url" content={og.url} />
+        <meta property="og:type" content={og.type} />
+        <meta property="og:title" content={og.title} />
+        <meta property="og:description" content={og.description} />
+        <meta property="og:image" content={og.image} />
+        <meta property="og:site_name" content={og.site_name} />
+        <meta property="og:locale" content={og.locale} />
 
         {/* Article specific */}
-        {ogData.author && (
-          <meta property="article:author" content={ogData.author} />
+        {og.author && <meta property="article:author" content={og.author} />}
+        {og.publishedTime && (
+          <meta property="article:published_time" content={og.publishedTime} />
         )}
-        {ogData.publishedTime && (
-          <meta
-            property="article:published_time"
-            content={ogData.publishedTime}
-          />
-        )}
-        {ogData.section && (
-          <meta property="article:section" content={ogData.section} />
-        )}
+        {og.section && <meta property="article:section" content={og.section} />}
 
-        {/* Twitter Card */}
+        {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={ogData.title} />
-        <meta name="twitter:description" content={ogData.description} />
-        <meta name="twitter:image" content={ogData.image} />
+        <meta name="twitter:title" content={og.title} />
+        <meta name="twitter:description" content={og.description} />
+        <meta name="twitter:image" content={og.image} />
       </Helmet>
 
       <Header />
