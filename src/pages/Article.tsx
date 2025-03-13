@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { useArticleById } from "@/hooks/useArticles";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Calendar, User, Share2 } from "lucide-react";
 import { categoryColors, categoryLabels } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
+import { getApiUrl } from "@/lib/config";
+
+const API_URL = getApiUrl();
 
 const Article = () => {
   const { id } = useParams<{ id: string }>();
@@ -56,12 +60,54 @@ const Article = () => {
     );
   }
 
+  const canonicalUrl = `https://gaafu.mv/article/${article.id}`;
+
   return (
     <div
       className={`min-h-screen transition-opacity duration-500 ${
         isVisible ? "opacity-100" : "opacity-0"
       }`}
     >
+      <Helmet>
+        <title>{article.title} - ގާފު މަޖައްލާ</title>
+        <meta
+          name="description"
+          content={article.excerpt || article.content.substring(0, 160)}
+        />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:title" content={article.title} />
+        <meta
+          property="og:description"
+          content={article.excerpt || article.content.substring(0, 160)}
+        />
+        <meta property="og:image" content={article.image_url} />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={canonicalUrl} />
+        <meta property="twitter:title" content={article.title} />
+        <meta
+          property="twitter:description"
+          content={article.excerpt || article.content.substring(0, 160)}
+        />
+        <meta property="twitter:image" content={article.image_url} />
+
+        {/* Additional Article Meta */}
+        <meta property="article:published_time" content={article.created_at} />
+        <meta
+          property="article:author"
+          content={article.author || article.author_name}
+        />
+        <meta
+          property="article:section"
+          content={categoryLabels[article.category || "habaru"]}
+        />
+        <link rel="canonical" href={canonicalUrl} />
+      </Helmet>
+
       <Header />
 
       <main className="pt-32 pb-16">
@@ -91,12 +137,16 @@ const Article = () => {
               {(article.author || article.author_name) && (
                 <div className="flex items-center gap-1">
                   <User className="h-4 w-4" />
-                  <span className="font-dhivehi">{article.author || article.author_name}</span>
+                  <span className="font-dhivehi">
+                    {article.author || article.author_name}
+                  </span>
                 </div>
               )}
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                <span className="font-dhivehi">{formatDate(article.created_at)}</span>
+                <span className="font-dhivehi">
+                  {formatDate(article.created_at)}
+                </span>
               </div>
             </div>
 
@@ -113,7 +163,9 @@ const Article = () => {
             <div className="prose prose-lg max-w-none font-dhivehi">
               {/* Excerpt as intro paragraph */}
               {article.excerpt && (
-                <p className="font-medium text-xl font-dhivehi">{article.excerpt}</p>
+                <p className="font-medium text-xl font-dhivehi">
+                  {article.excerpt}
+                </p>
               )}
 
               {/* Main content */}

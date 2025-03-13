@@ -12,50 +12,53 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import ArticleEditor from "./pages/ArticleEditor";
 import "./App.css";
+import { HelmetProvider } from "react-helmet-async";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <Router>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/article/:id" element={<Article />} />
-          <Route path="/category/:category" element={<Category />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/articles/new"
-            element={
-              <ProtectedRoute>
-                <ArticleEditor />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/articles/edit/:id"
-            element={
-              <ProtectedRoute>
-                <ArticleEditor />
-              </ProtectedRoute>
-            }
-          />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <HelmetProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/article/:id" element={<Article />} />
+            <Route path="/category/:category" element={<Category />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/articles/new"
+              element={
+                <ProtectedRoute>
+                  <ArticleEditor />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/articles/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <ArticleEditor />
+                </ProtectedRoute>
+              }
+            />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
+        </Router>
+      </QueryClientProvider>
+    </ErrorBoundary>
+  </HelmetProvider>
 );
 
 export default App;
