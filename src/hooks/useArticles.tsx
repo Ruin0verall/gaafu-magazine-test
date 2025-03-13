@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Article, Category } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 import { getApiUrl } from "@/lib/config";
@@ -13,7 +13,6 @@ const CACHE_DURATION = 60000; // Cache for 1 minute
 
 // Common fetch options for all API calls
 const fetchOptions: RequestInit = {
-  credentials: "include",
   headers: {
     "Content-Type": "application/json",
   },
@@ -27,53 +26,71 @@ async function fetchArticlesWithCache(): Promise<Article[]> {
     return articlesCache;
   }
 
-  const response = await fetch(`${API_URL}/articles`, fetchOptions);
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch articles: ${response.status} ${response.statusText}`
-    );
-  }
-  const data = await response.json();
-  console.log("Raw data from API:", data);
-  
-  // Map category_id to category name
-  const articlesWithCategories = data.map((article: Article) => {
-    let category: Category | undefined;
-    switch (article.category_id) {
-      case 1:
-        category = "politics";
-        break;
-      case 2:
-        category = "business";
-        break;
-      case 3:
-        category = "sports";
-        break;
-      case 4:
-        category = "technology";
-        break;
-      case 5:
-        category = "health";
-        break;
-      case 6:
-        category = "world";
-        break;
-      case 7:
-        category = "habaru";
-        break;
+  try {
+    console.log("Fetching articles from API:", `${API_URL}/articles`);
+    const response = await fetch(`${API_URL}/articles`, fetchOptions);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch articles: ${response.status} ${response.statusText}`
+      );
     }
-    console.log(`Mapping article ${article.id}: category_id=${article.category_id} -> category=${category}`);
-    return {
-      ...article,
-      category
-    };
-  });
+    const data = await response.json();
+    console.log("Raw data from API:", data);
 
-  console.log("Mapped articles with categories:", articlesWithCategories);
+    // Map category_id to category name
+    const articlesWithCategories = data.map((article: Article) => {
+      // Ensure category_id is treated as a number
+      const categoryId = Number(article.category_id);
+      let category: Category | undefined;
 
-  articlesCache = articlesWithCategories;
-  lastFetchTime = now;
-  return articlesWithCategories;
+      // Map category_id to category
+      switch (categoryId) {
+        case 1:
+          category = "politics";
+          break;
+        case 2:
+          category = "business";
+          break;
+        case 3:
+          category = "sports";
+          break;
+        case 4:
+          category = "technology";
+          break;
+        case 5:
+          category = "health";
+          break;
+        case 6:
+          category = "world";
+          break;
+        case 7:
+          category = "habaru";
+          break;
+        default:
+          console.warn(
+            `Unknown category_id: ${categoryId} for article ${article.id}`
+          );
+          break;
+      }
+
+      console.log(
+        `Mapping article ${article.id}: category_id=${categoryId} -> category=${category}`
+      );
+      return {
+        ...article,
+        category_id: categoryId, // Ensure it's stored as a number
+        category,
+      };
+    });
+
+    console.log("Mapped articles with categories:", articlesWithCategories);
+    articlesCache = articlesWithCategories;
+    lastFetchTime = now;
+    return articlesWithCategories;
+  } catch (error) {
+    console.error("Error fetching articles:", error);
+    throw error;
+  }
 }
 
 export function useArticles(page = 1) {
@@ -132,35 +149,43 @@ export function useArticlesByCategory(category: Category | "all", page = 1) {
     const fetchArticlesByCategory = async () => {
       try {
         console.log("Fetching articles for category:", category);
-        
-        if (category === "all") {
-          if (isMounted) {
-            setArticles([]);
-            setIsLoading(false);
-          }
-          return;
-        }
-
         const data = await fetchArticlesWithCache();
         if (!isMounted) return;
 
-        const categoryId = getCategoryId(category);
-        console.log("Category ID for filtering:", categoryId);
-        console.log("Available articles before filtering:", data);
-        
-        const filteredArticles = data.filter(
-          (article: Article) => {
-            console.log(`Checking article ${article.id}: category_id=${article.category_id} against ${categoryId}`);
-            return article.category_id === categoryId;
-          }
+        let filteredArticles = data;
+
+        if (category !== "all") {
+          const categoryId = getCategoryId(category);
+          console.log("Filtering by category ID:", categoryId);
+
+          filteredArticles = data.filter((article: Article) => {
+            // Ensure we're comparing numbers with numbers
+            const matches = Number(article.category_id) === categoryId;
+            console.log(
+              `Article ${article.id}: category_id=${
+                article.category_id
+              } (${typeof article.category_id}) vs ${categoryId} (${typeof categoryId}), matches=${matches}`
+            );
+            return matches;
+          });
+        }
+
+        // Sort by created_at in descending order
+        filteredArticles.sort(
+          (a: Article, b: Article) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
 
         console.log("Category filtering results:", {
           category,
-          categoryId,
+          categoryId: category !== "all" ? getCategoryId(category) : "all",
           totalArticles: data.length,
           filteredCount: filteredArticles.length,
-          filteredArticles
+          filteredArticles: filteredArticles.map((a) => ({
+            id: a.id,
+            category_id: a.category_id,
+            category: a.category,
+          })),
         });
 
         setArticles(filteredArticles);
@@ -192,21 +217,6 @@ export function useArticlesByCategory(category: Category | "all", page = 1) {
   };
 }
 
-// Helper function to get category ID (memoized)
-const categoryMap: Record<Category, number> = {
-  politics: 1,
-  business: 2,
-  sports: 3,
-  technology: 4,
-  health: 5,
-  world: 6,
-  habaru: 7,
-};
-
-function getCategoryId(category: Category): number {
-  return categoryMap[category];
-}
-
 export function useArticleById(id: string) {
   const [article, setArticle] = useState<Article | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -217,14 +227,14 @@ export function useArticleById(id: string) {
 
     const fetchArticle = async () => {
       try {
-        console.log('Fetching article with ID:', id);
-        console.log('API URL:', `${API_URL}/articles/${id}`);
-        
+        console.log("Fetching article with ID:", id);
+        console.log("API URL:", `${API_URL}/articles/${id}`);
+
         // Check cache first
         if (articlesCache) {
           const cachedArticle = articlesCache.find((a) => String(a.id) === id);
           if (cachedArticle && isMounted) {
-            console.log('Found article in cache:', cachedArticle);
+            console.log("Found article in cache:", cachedArticle);
             setArticle(cachedArticle);
             setIsLoading(false);
             return;
@@ -232,25 +242,25 @@ export function useArticleById(id: string) {
         }
 
         const response = await fetch(`${API_URL}/articles/${id}`, fetchOptions);
-        console.log('API Response:', {
+        console.log("API Response:", {
           status: response.status,
           statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries())
+          headers: Object.fromEntries(response.headers.entries()),
         });
 
         if (!response.ok) {
           if (response.status === 404) {
-            console.log('Article not found in database');
+            console.log("Article not found in database");
             throw new Error("Article not found");
           }
           throw new Error(
             `Failed to fetch article: ${response.status} ${response.statusText}`
           );
         }
-        
+
         const data = await response.json();
-        console.log('Article data received:', data);
-        
+        console.log("Article data received:", data);
+
         if (isMounted) {
           setArticle(data);
           setIsLoading(false);
@@ -286,9 +296,23 @@ export function useFeaturedArticle() {
     const fetchFeaturedArticle = async () => {
       try {
         const data = await fetchArticlesWithCache();
-        if (isMounted) {
-          console.log("Featured article data:", data);
-          setArticle(data[0] || null);
+        if (isMounted && data.length > 0) {
+          // Sort by created_at in descending order and take the most recent article
+          const sortedArticles = [...data].sort(
+            (a: Article, b: Article) =>
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+          );
+          const mostRecentArticle = sortedArticles[0];
+          console.log(
+            "Selected most recent article as featured:",
+            mostRecentArticle
+          );
+          setArticle(mostRecentArticle);
+          setIsLoading(false);
+        } else {
+          console.log("No articles found for featuring");
+          setArticle(null);
           setIsLoading(false);
         }
       } catch (err) {
@@ -311,4 +335,19 @@ export function useFeaturedArticle() {
   }, []);
 
   return { article, isLoading, error };
+}
+
+// Helper function to get category ID
+const categoryMap: Record<Category, number> = {
+  politics: 1,
+  business: 2,
+  sports: 3,
+  technology: 4,
+  health: 5,
+  world: 6,
+  habaru: 7,
+};
+
+function getCategoryId(category: Category): number {
+  return categoryMap[category];
 }
