@@ -1,20 +1,12 @@
-import { useEffect, useState, Suspense, lazy } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useArticleById } from "@/hooks/useArticles";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { Calendar, User, Share2 } from "lucide-react";
 import { categoryColors, categoryLabels } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 import { Helmet } from "react-helmet-async";
-import OptimizedImage from "@/components/OptimizedImage";
-
-// Lazy load components
-const Header = lazy(() => import("@/components/Header"));
-const Footer = lazy(() => import("@/components/Footer"));
-
-// Loading fallback component
-const LoadingFallback = () => (
-  <div className="animate-pulse bg-gaafu-muted h-16"></div>
-);
 
 const Article = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,14 +16,7 @@ const Article = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     setIsVisible(true);
-
-    // Preload next article
-    if (article?.id) {
-      const nextArticleId = String(Number(article.id) + 1);
-      const preloadArticle = new Image();
-      preloadArticle.src = `https://havaasa-backend-production.up.railway.app/api/articles/${nextArticleId}`;
-    }
-  }, [article]);
+  }, []);
 
   // Function to prepare OG data
   const getOgData = (article: any) => {
@@ -63,9 +48,7 @@ const Article = () => {
           <title>Loading... | Gaafu Magazine</title>
           <meta name="description" content="Loading article..." />
         </Helmet>
-        <Suspense fallback={<LoadingFallback />}>
-          <Header />
-        </Suspense>
+        <Header />
         <div className="container mx-auto px-4 pt-32 pb-16">
           <div className="max-w-3xl mx-auto">
             <div className="w-full h-64 bg-gaafu-muted animate-pulse rounded-xl mb-6"></div>
@@ -75,9 +58,7 @@ const Article = () => {
             <div className="w-2/3 h-4 bg-gaafu-muted animate-pulse rounded mb-6"></div>
           </div>
         </div>
-        <Suspense fallback={<LoadingFallback />}>
-          <Footer />
-        </Suspense>
+        <Footer />
       </div>
     );
   }
@@ -92,9 +73,7 @@ const Article = () => {
             content="The requested article could not be found."
           />
         </Helmet>
-        <Suspense fallback={<LoadingFallback />}>
-          <Header />
-        </Suspense>
+        <Header />
         <div className="container mx-auto px-4 pt-32 pb-16 text-center">
           <h1 className="text-2xl font-bold mb-4 font-dhivehi">
             އާޓިކަލް ނުފެނުނު
@@ -107,9 +86,7 @@ const Article = () => {
             މައި ސަފްޙާއަށް ދާންވީތަ؟
           </Link>
         </div>
-        <Suspense fallback={<LoadingFallback />}>
-          <Footer />
-        </Suspense>
+        <Footer />
       </div>
     );
   }
@@ -153,9 +130,7 @@ const Article = () => {
         <meta name="twitter:image" content={og.image} />
       </Helmet>
 
-      <Suspense fallback={<LoadingFallback />}>
-        <Header />
-      </Suspense>
+      <Header />
 
       <main className="pt-32 pb-16">
         <article className="container mx-auto px-4 md:px-6">
@@ -199,10 +174,10 @@ const Article = () => {
 
             {/* Featured Image */}
             <div className="mb-8 rounded-xl overflow-hidden shadow-md">
-              <OptimizedImage
+              <img
                 src={article.image_url}
                 alt={article.title}
-                className="w-full"
+                className="w-full h-auto"
               />
             </div>
 
@@ -239,9 +214,7 @@ const Article = () => {
         </article>
       </main>
 
-      <Suspense fallback={<LoadingFallback />}>
-        <Footer />
-      </Suspense>
+      <Footer />
     </div>
   );
 };
