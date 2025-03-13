@@ -1,8 +1,19 @@
 {
   "rewrites": [
     {
+      "source": "/article/:id",
+      "destination": "havaasa-backend-production.up.railway.app/article/:id"
+    }
+  ],
+  "headers": [
+    {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
     }
   ]
-} 
+}
