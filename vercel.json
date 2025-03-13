@@ -2,7 +2,14 @@
   "rewrites": [
     {
       "source": "/article/:id",
-      "destination": "havaasa-backend-production.up.railway.app/article/:id"
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*facebookexternalhit.*|.*Twitterbot.*|.*LinkedInBot.*|.*WhatsApp.*|.*Slackbot.*|.*TelegramBot.*"
+        }
+      ],
+      "destination": "https://havaasa-backend-production.up.railway.app/api/articles/:id"
     }
   ],
   "headers": [
@@ -12,8 +19,21 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization, User-Agent"
         }
       ]
     }
-  ]
+  ],
+  "regions": ["sin1"]
 }
