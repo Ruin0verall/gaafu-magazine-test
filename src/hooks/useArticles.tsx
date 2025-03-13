@@ -23,7 +23,6 @@ const fetchOptions: RequestInit = {
 async function fetchArticlesWithCache(): Promise<Article[]> {
   const now = Date.now();
   if (articlesCache && now - lastFetchTime < CACHE_DURATION) {
-    console.log("Returning cached articles:", articlesCache);
     return articlesCache;
   }
 
@@ -34,7 +33,6 @@ async function fetchArticlesWithCache(): Promise<Article[]> {
     );
   }
   const data = await response.json();
-  console.log("Raw data from API:", data);
   
   // Map category_id to category name
   const articlesWithCategories = data.map((article: Article) => {
@@ -55,21 +53,18 @@ async function fetchArticlesWithCache(): Promise<Article[]> {
       case 5:
         category = "health";
         break;
-      case 6:
-        category = "world";
-        break;
-      case 7:
-        category = "habaru";
-        break;
     }
-    console.log(`Mapping article ${article.id}: category_id=${article.category_id} -> category=${category}`);
     return {
       ...article,
       category
     };
   });
 
-  console.log("Mapped articles with categories:", articlesWithCategories);
+  console.log("API Response Data with categories:", {
+    firstArticle: articlesWithCategories[0],
+    category: articlesWithCategories[0]?.category,
+    totalArticles: articlesWithCategories.length,
+  });
 
   articlesCache = articlesWithCategories;
   lastFetchTime = now;
@@ -131,8 +126,6 @@ export function useArticlesByCategory(category: Category | "all", page = 1) {
 
     const fetchArticlesByCategory = async () => {
       try {
-        console.log("Fetching articles for category:", category);
-        
         if (category === "all") {
           if (isMounted) {
             setArticles([]);
@@ -145,22 +138,15 @@ export function useArticlesByCategory(category: Category | "all", page = 1) {
         if (!isMounted) return;
 
         const categoryId = getCategoryId(category);
-        console.log("Category ID for filtering:", categoryId);
-        console.log("Available articles before filtering:", data);
-        
         const filteredArticles = data.filter(
-          (article: Article) => {
-            console.log(`Checking article ${article.id}: category_id=${article.category_id} against ${categoryId}`);
-            return article.category_id === categoryId;
-          }
+          (article: Article) => article.category_id === categoryId
         );
 
-        console.log("Category filtering results:", {
+        console.log("Category filtering debug:", {
           category,
           categoryId,
           totalArticles: data.length,
           filteredCount: filteredArticles.length,
-          filteredArticles
         });
 
         setArticles(filteredArticles);
@@ -199,8 +185,6 @@ const categoryMap: Record<Category, number> = {
   sports: 3,
   technology: 4,
   health: 5,
-  world: 6,
-  habaru: 7,
 };
 
 function getCategoryId(category: Category): number {
