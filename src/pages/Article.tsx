@@ -6,7 +6,6 @@ import Footer from "@/components/Footer";
 import { Calendar, User, Share2 } from "lucide-react";
 import { categoryColors, categoryLabels } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
-import { Helmet } from "react-helmet-async";
 
 const Article = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,36 +17,9 @@ const Article = () => {
     setIsVisible(true);
   }, []);
 
-  // Function to prepare OG data
-  const getOgData = (article: any) => {
-    const baseUrl = window.location.origin;
-    const currentUrl = `${baseUrl}/article/${id}`;
-    const defaultImageUrl = `${baseUrl}/og-image.png`;
-
-    const imageUrl = article.image_url || defaultImageUrl;
-
-    return {
-      title: article.title,
-      description:
-        article.excerpt || article.content?.substring(0, 160) + "...",
-      image: imageUrl,
-      url: currentUrl,
-      type: "article",
-      site_name: "Gaafu Magazine",
-      locale: "dv_MV",
-      author: article.author || article.author_name,
-      publishedTime: article.created_at,
-      section: article.category ? categoryLabels[article.category] : undefined,
-    };
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen">
-        <Helmet>
-          <title>Loading... | Gaafu Magazine</title>
-          <meta name="description" content="Loading article..." />
-        </Helmet>
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16">
           <div className="max-w-3xl mx-auto">
@@ -66,13 +38,6 @@ const Article = () => {
   if (error || !article) {
     return (
       <div className="min-h-screen">
-        <Helmet>
-          <title>Article Not Found | Gaafu Magazine</title>
-          <meta
-            name="description"
-            content="The requested article could not be found."
-          />
-        </Helmet>
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16 text-center">
           <h1 className="text-2xl font-bold mb-4 font-dhivehi">
@@ -91,45 +56,12 @@ const Article = () => {
     );
   }
 
-  const og = getOgData(article);
-
   return (
     <div
       className={`min-h-screen transition-opacity duration-500 ${
         isVisible ? "opacity-100" : "opacity-0"
       }`}
     >
-      <Helmet>
-        {/* Basic meta tags */}
-        <title>{og.title} | Gaafu Magazine</title>
-        <meta name="description" content={og.description} />
-        <link rel="canonical" href={og.url} />
-
-        {/* OpenGraph meta tags */}
-        <meta property="og:url" content={og.url} />
-        <meta property="og:type" content={og.type} />
-        <meta property="og:title" content={`${og.title} | Gaafu Magazine`} />
-        <meta property="og:description" content={og.description} />
-        <meta property="og:image" content={og.image} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:site_name" content={og.site_name} />
-        <meta property="og:locale" content={og.locale} />
-
-        {/* Article specific */}
-        {og.author && <meta property="article:author" content={og.author} />}
-        {og.publishedTime && (
-          <meta property="article:published_time" content={og.publishedTime} />
-        )}
-        {og.section && <meta property="article:section" content={og.section} />}
-
-        {/* Twitter Card tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${og.title} | Gaafu Magazine`} />
-        <meta name="twitter:description" content={og.description} />
-        <meta name="twitter:image" content={og.image} />
-      </Helmet>
-
       <Header />
 
       <main className="pt-32 pb-16">
@@ -159,16 +91,12 @@ const Article = () => {
               {(article.author || article.author_name) && (
                 <div className="flex items-center gap-1">
                   <User className="h-4 w-4" />
-                  <span className="font-dhivehi">
-                    {article.author || article.author_name}
-                  </span>
+                  <span className="font-dhivehi">{article.author || article.author_name}</span>
                 </div>
               )}
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                <span className="font-dhivehi">
-                  {formatDate(article.created_at)}
-                </span>
+                <span className="font-dhivehi">{formatDate(article.created_at)}</span>
               </div>
             </div>
 
@@ -185,9 +113,7 @@ const Article = () => {
             <div className="prose prose-lg max-w-none font-dhivehi">
               {/* Excerpt as intro paragraph */}
               {article.excerpt && (
-                <p className="font-medium text-xl font-dhivehi">
-                  {article.excerpt}
-                </p>
+                <p className="font-medium text-xl font-dhivehi">{article.excerpt}</p>
               )}
 
               {/* Main content */}
