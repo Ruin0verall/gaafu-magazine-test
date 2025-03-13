@@ -15,7 +15,7 @@ const Footer = () => {
                 <img
                   src="/Logo/White.svg"
                   alt="Havaasa Logo"
-                  className="h-12"
+                  className="h-16"
                 />
               </Link>
               <div className="flex flex-col text-white/80">
