@@ -45,19 +45,15 @@ const MetaTags: React.FC<MetaTagsProps> = ({
       <meta name="title" content={finalTitle} />
       <meta name="description" content={finalDescription} />
 
-      {/* Open Graph / Facebook */}
-      <meta property="og:type" content="website" />
+      {/* Facebook Open Graph */}
+      <meta property="og:type" content="article" />
       <meta property="og:url" content={finalUrl} />
+      <meta property="og:site_name" content="Gaafu Magazine" />
       <meta property="og:title" content={finalTitle} />
       <meta property="og:description" content={finalDescription} />
       <meta property="og:image" content={absoluteImageUrl} />
-
-      {/* Twitter */}
-      <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:url" content={finalUrl} />
-      <meta property="twitter:title" content={finalTitle} />
-      <meta property="twitter:description" content={finalDescription} />
-      <meta property="twitter:image" content={absoluteImageUrl} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
     </Helmet>
   );
 };
