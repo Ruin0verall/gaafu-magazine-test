@@ -3,7 +3,11 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ArticleCard from "@/components/ArticleCard";
 import FeaturedArticle from "@/components/FeaturedArticle";
-import { useFeaturedArticle, useArticles } from "@/hooks/useArticles";
+import {
+  useFeaturedArticle,
+  useArticles,
+  useArticlesByCategory,
+} from "@/hooks/useArticles";
 import { Category, categoryLabels } from "@/lib/types";
 import { ChevronRight } from "lucide-react";
 
@@ -13,39 +17,31 @@ const Index = () => {
     isLoading: featuredLoading,
     error: featuredError,
   } = useFeaturedArticle();
-
   const [selectedCategory, setSelectedCategory] = useState<Category | "all">(
     "all"
   );
-  const {
-    articles: allArticles,
-    isLoading: articlesLoading,
-    error: articlesError,
-  } = useArticles();
-  const [filteredArticles, setFilteredArticles] = useState(allArticles);
+  const { articles: allArticles, isLoading: allArticlesLoading } =
+    useArticles();
+  const { articles: categoryArticles, isLoading: categoryLoading } =
+    useArticlesByCategory(selectedCategory as Category);
   const [isVisible, setIsVisible] = useState(false);
 
-  // Filter articles when category or allArticles changes
+  // Debug logging for category changes
   useEffect(() => {
-    if (selectedCategory === "all") {
-      setFilteredArticles(allArticles);
-    } else {
-      const filtered = allArticles.filter(
-        (article) => article.category === selectedCategory
-      );
-      setFilteredArticles(filtered);
-    }
-
     console.log("Category changed:", {
       selectedCategory,
-      allArticlesCount: allArticles.length,
-      filteredCount: filteredArticles.length,
+      articles: selectedCategory === "all" ? allArticles : categoryArticles,
     });
-  }, [selectedCategory, allArticles]);
+  }, [selectedCategory, allArticles, categoryArticles]);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  // Use either all articles or filtered articles based on selection
+  const articles = selectedCategory === "all" ? allArticles : categoryArticles;
+  const isLoading =
+    selectedCategory === "all" ? allArticlesLoading : categoryLoading;
 
   return (
     <div
@@ -115,7 +111,7 @@ const Index = () => {
             </div>
 
             {/* Articles Grid */}
-            {articlesLoading ? (
+            {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {[...Array(6)].map((_, i) => (
                   <div
@@ -124,21 +120,15 @@ const Index = () => {
                   ></div>
                 ))}
               </div>
-            ) : articlesError ? (
-              <div className="text-center py-16">
-                <p className="text-gaafu-foreground/60 font-dhivehi text-lg">
-                  އާޓިކަލްތައް ލޯޑް ނުކުރެވުނު
-                </p>
-              </div>
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                  {filteredArticles.map((article) => (
+                  {articles.map((article) => (
                     <ArticleCard key={article.id} article={article} />
                   ))}
                 </div>
 
-                {filteredArticles.length === 0 && (
+                {articles.length === 0 && (
                   <div className="text-center py-16 rounded-xl bg-gaafu-muted/50 my-8">
                     <p className="text-gaafu-foreground/60 font-dhivehi text-lg">
                       މި ބަޔަށް ނިއުސް ނެތް
