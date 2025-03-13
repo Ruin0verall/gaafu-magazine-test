@@ -22,14 +22,15 @@ const Article = () => {
   const getOgData = (article: any) => {
     const baseUrl = window.location.origin;
     const currentUrl = `${baseUrl}/article/${id}`;
+    const imageUrl = article.image_url?.startsWith("http")
+      ? article.image_url
+      : `${baseUrl}${article.image_url}`;
 
     return {
       title: article.title,
       description:
         article.excerpt || article.content?.substring(0, 160) + "...",
-      image: article.image_url?.startsWith("http")
-        ? article.image_url
-        : `${baseUrl}${article.image_url}`,
+      image: imageUrl,
       url: currentUrl,
       type: "article",
       site_name: "Gaafu Magazine",
@@ -102,13 +103,16 @@ const Article = () => {
         {/* Basic meta tags */}
         <title>{og.title} | Gaafu Magazine</title>
         <meta name="description" content={og.description} />
+        <link rel="canonical" href={og.url} />
 
         {/* OpenGraph meta tags */}
         <meta property="og:url" content={og.url} />
         <meta property="og:type" content={og.type} />
-        <meta property="og:title" content={og.title} />
+        <meta property="og:title" content={`${og.title} | Gaafu Magazine`} />
         <meta property="og:description" content={og.description} />
         <meta property="og:image" content={og.image} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta property="og:site_name" content={og.site_name} />
         <meta property="og:locale" content={og.locale} />
 
@@ -121,7 +125,7 @@ const Article = () => {
 
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={og.title} />
+        <meta name="twitter:title" content={`${og.title} | Gaafu Magazine`} />
         <meta name="twitter:description" content={og.description} />
         <meta name="twitter:image" content={og.image} />
       </Helmet>
