@@ -60,6 +60,7 @@ const Article = () => {
   }
 
   const currentUrl = `${window.location.origin}/article/${id}`;
+  const description = article.excerpt || article.content.substring(0, 160);
 
   return (
     <div
@@ -69,9 +70,14 @@ const Article = () => {
     >
       <MetaTags
         title={article.title}
-        description={article.excerpt || article.content.substring(0, 160)}
+        description={description}
         image={article.image_url}
         url={currentUrl}
+        author={article.author || article.author_name}
+        publishedTime={article.created_at}
+        section={
+          article.category ? categoryLabels[article.category] : undefined
+        }
       />
       <Header />
 
