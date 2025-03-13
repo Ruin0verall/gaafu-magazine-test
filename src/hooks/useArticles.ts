@@ -18,6 +18,7 @@ async function fetchArticles() {
   return response.json();
 }
 
+<<<<<<< HEAD
 async function fetchFeaturedArticle() {
   const response = await fetch(`${API_URL}/articles/featured`);
   if (!response.ok) {
@@ -34,6 +35,8 @@ async function fetchArticlesByCategory(category: string) {
   return response.json();
 }
 
+=======
+>>>>>>> parent of 477243e (Revert "tweaks")
 export function useArticleById(id: string) {
   const {
     data: article,
@@ -62,6 +65,7 @@ export function useArticles() {
   return { articles, isLoading, error };
 }
 
+<<<<<<< HEAD
 export function useFeaturedArticle() {
   const {
     data: article,
@@ -91,6 +95,8 @@ export function useArticlesByCategory(category: string) {
   return { articles, isLoading, error };
 }
 
+=======
+>>>>>>> parent of 477243e (Revert "tweaks")
 // Prefetch function for SSR or early loading
 export async function prefetchArticle(id: string) {
   const article = await fetchArticle(id);
@@ -102,6 +108,7 @@ export async function prefetchArticles() {
   const articles = await fetchArticles();
   return articles;
 }
+<<<<<<< HEAD
 
 // Prefetch featured article
 export async function prefetchFeaturedArticle() {
@@ -114,3 +121,5 @@ export async function prefetchArticlesByCategory(category: string) {
   const articles = await fetchArticlesByCategory(category);
   return articles;
 }
+=======
+>>>>>>> parent of 477243e (Revert "tweaks")
