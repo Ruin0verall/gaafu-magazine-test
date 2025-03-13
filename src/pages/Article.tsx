@@ -6,7 +6,6 @@ import Footer from "@/components/Footer";
 import { Calendar, User, Share2 } from "lucide-react";
 import { categoryColors, categoryLabels } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
-import MetaTags from "@/components/MetaTags";
 
 const Article = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,7 +20,6 @@ const Article = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen">
-        <MetaTags />
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16">
           <div className="max-w-3xl mx-auto">
@@ -40,7 +38,6 @@ const Article = () => {
   if (error || !article) {
     return (
       <div className="min-h-screen">
-        <MetaTags />
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16 text-center">
           <h1 className="text-2xl font-bold mb-4 font-dhivehi">
@@ -59,26 +56,12 @@ const Article = () => {
     );
   }
 
-  const currentUrl = `${window.location.origin}/article/${id}`;
-  const description = article.excerpt || article.content.substring(0, 160);
-
   return (
     <div
       className={`min-h-screen transition-opacity duration-500 ${
         isVisible ? "opacity-100" : "opacity-0"
       }`}
     >
-      <MetaTags
-        title={article.title}
-        description={description}
-        image={article.image_url}
-        url={currentUrl}
-        author={article.author || article.author_name}
-        publishedTime={article.created_at}
-        section={
-          article.category ? categoryLabels[article.category] : undefined
-        }
-      />
       <Header />
 
       <main className="pt-32 pb-16">
@@ -108,16 +91,12 @@ const Article = () => {
               {(article.author || article.author_name) && (
                 <div className="flex items-center gap-1">
                   <User className="h-4 w-4" />
-                  <span className="font-dhivehi">
-                    {article.author || article.author_name}
-                  </span>
+                  <span className="font-dhivehi">{article.author || article.author_name}</span>
                 </div>
               )}
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                <span className="font-dhivehi">
-                  {formatDate(article.created_at)}
-                </span>
+                <span className="font-dhivehi">{formatDate(article.created_at)}</span>
               </div>
             </div>
 
@@ -134,9 +113,7 @@ const Article = () => {
             <div className="prose prose-lg max-w-none font-dhivehi">
               {/* Excerpt as intro paragraph */}
               {article.excerpt && (
-                <p className="font-medium text-xl font-dhivehi">
-                  {article.excerpt}
-                </p>
+                <p className="font-medium text-xl font-dhivehi">{article.excerpt}</p>
               )}
 
               {/* Main content */}
