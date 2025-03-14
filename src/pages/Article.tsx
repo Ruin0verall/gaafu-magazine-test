@@ -145,7 +145,11 @@ const Article = () => {
               )}
 
               {/* Main content */}
-              <div className="mt-6 font-dhivehi">{article.content}</div>
+              <div
+                className="mt-6 font-dhivehi [&>*]:font-dhivehi [&_p]:text-right [&_p]:font-normal [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:mr-5 [&_ol]:mr-5 [&_li]:text-right [&_li]:mb-0 [&_p]:mb-0 [&_ul]:mb-1 [&_ol]:mb-1 [&_h1]:text-4xl [&_h2]:text-3xl [&_h3]:text-2xl [&_h4]:text-xl [&_h5]:text-lg [&_h6]:text-base [&_h1]:mb-2 [&_h2]:mb-2 [&_h3]:mb-1.5 [&_ul]:text-inherit [&_ol]:text-inherit [&_li]:text-inherit [&_*]:leading-[1.5] [&_p]:leading-[1.5] [&_h1]:font-bold [&_h2]:font-bold [&_h3]:font-bold [&_h4]:font-bold [&_h5]:font-bold [&_h6]:font-bold [&_p]:!font-size [&_p]:!font-size [&_span]:!font-size [&_strong]:!font-size [&_em]:!font-size [&_li]:!font-size"
+                dangerouslySetInnerHTML={{ __html: article.content }}
+                style={{ fontSize: "16px" }}
+              />
             </div>
 
             {/* Share */}

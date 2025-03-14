@@ -293,88 +293,185 @@ const ArticleEditor: React.FC = () => {
                       apiKey={TINYMCE_API_KEY}
                       id="content"
                       value={formData.content}
-                      onEditorChange={(content) =>
-                        setFormData({ ...formData, content })
-                      }
+                      onEditorChange={(content, editor) => {
+                        // Preserve HTML formatting
+                        setFormData({ ...formData, content: content });
+                      }}
                       init={{
                         height: 500,
                         menubar: false,
                         directionality: "rtl",
                         language: "en",
+                        encoding: "xml",
+                        entity_encoding: "raw",
+                        schema: "html5",
+                        convert_urls: false,
+                        remove_script_host: false,
+                        cleanup: true,
+                        cleanup_on_startup: true,
                         plugins: [
                           "advlist",
                           "autolink",
                           "lists",
                           "link",
                           "image",
+                          "charmap",
                           "preview",
                           "anchor",
                           "searchreplace",
+                          "visualblocks",
+                          "code",
                           "fullscreen",
+                          "insertdatetime",
                           "media",
                           "table",
                           "help",
                           "wordcount",
+                          "lineheight",
                         ],
-                        toolbar:
-                          "styles | bold italic | alignright aligncenter alignjustify | bullist numlist | link image",
+                        toolbar: [
+                          "undo redo | formatselect | fontsizeinput | lineheight | bold italic | alignright aligncenter alignjustify",
+                          "bullist numlist | link image",
+                        ],
                         content_style: `
+                          @font-face {
+                            font-family: 'MV-Waheed';
+                            src: url('/fonts/MVWaheed.ttf') format('truetype');
+                            font-weight: normal;
+                            font-style: normal;
+                          }
                           :root {
-                            --content-font: MV-Waheed, Faruma, sans-serif;
+                            --editor-line-height: 1.5;
                           }
                           body { 
-                            font-family: var(--content-font);
-                            font-size: 18px;
-                            line-height: 2.5;
+                            font-family: 'MV-Waheed', sans-serif !important;
+                            font-size: 16px;
+                            line-height: var(--editor-line-height);
                             direction: rtl;
-                            margin: 1rem;
+                            margin: 0;
+                            padding: 8px;
+                          }
+                          strong, b {
+                            font-size: inherit;
+                            font-family: 'MV-Waheed', sans-serif !important;
+                          }
+                          em, i {
+                            font-size: inherit;
+                            font-family: 'MV-Waheed', sans-serif !important;
+                          }
+                          span {
+                            font-family: 'MV-Waheed', sans-serif !important;
+                          }
+                          h1 {
+                            font-size: 2.25rem !important;
+                            margin-bottom: 0.5rem;
+                            font-weight: bold;
+                            line-height: 1.15;
+                          }
+                          h2 {
+                            font-size: 1.875rem !important;
+                            margin-bottom: 0.5rem;
+                            font-weight: bold;
+                            line-height: 1.15;
+                          }
+                          h3 {
+                            font-size: 1.5rem !important;
+                            margin-bottom: 0.375rem;
+                            font-weight: bold;
+                            line-height: 1.15;
+                          }
+                          h4 {
+                            font-size: 1.25rem !important;
+                            margin-bottom: 0.375rem;
+                            font-weight: bold;
+                            line-height: 1.15;
+                          }
+                          h5 {
+                            font-size: 1.125rem !important;
+                            margin-bottom: 0.25rem;
+                            font-weight: bold;
+                            line-height: 1.15;
+                          }
+                          h6 {
+                            font-size: 1rem !important;
+                            margin-bottom: 0.25rem;
+                            font-weight: bold;
+                            line-height: 1.15;
                           }
                           p { 
-                            font-family: var(--content-font);
-                            margin: 0 0 1.5rem 0;
+                            font-family: 'MV-Waheed', sans-serif !important;
+                            font-weight: normal !important;
+                            margin: 0;
+                            padding: 0;
                             text-align: right;
-                            line-height: 2.5;
+                            line-height: var(--editor-line-height);
+                          }
+                          ul, ol {
+                            font-size: inherit;
+                            margin: 0 1.5em 0.25em 0;
+                            padding: 0;
+                            line-height: var(--editor-line-height);
+                          }
+                          li {
+                            font-family: 'MV-Waheed', sans-serif !important;
+                            font-size: inherit;
+                            margin: 0;
+                            line-height: var(--editor-line-height);
                           }
                           * {
-                            font-family: var(--content-font);
+                            font-family: 'MV-Waheed', sans-serif !important;
                           }
                         `,
                         formats: {
                           alignright: {
-                            selector: "p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li",
+                            selector: "p,h1,h2,h3,h4,h5,h6,ul,ol,li",
                             styles: { "text-align": "right" },
                           },
                           aligncenter: {
-                            selector: "p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li",
+                            selector: "p,h1,h2,h3,h4,h5,h6,ul,ol,li",
                             styles: { "text-align": "center" },
                           },
                           alignjustify: {
-                            selector: "p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li",
+                            selector: "p,h1,h2,h3,h4,h5,h6,ul,ol,li",
                             styles: { "text-align": "justify" },
                           },
                         },
-                        style_formats: [
-                          { title: "Paragraph", format: "p" },
-                          { title: "Heading 1", format: "h1" },
-                          { title: "Heading 2", format: "h2" },
-                          { title: "Heading 3", format: "h3" },
-                        ],
+                        fontsize_formats:
+                          "8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 20pt 24pt 36pt",
+                        lineheight_formats: "1 1.1 1.2 1.3 1.4 1.5 1.6 1.75 2",
+                        style_formats: [{ title: "Paragraph", format: "p" }],
+                        element_format: "html",
+                        verify_html: true,
+                        forced_root_block: "p",
+                        forced_root_block_attrs: {
+                          style:
+                            "margin: 0 0 1em 0; padding: 0; line-height: 1.5;",
+                        },
                         valid_elements:
-                          "p,h1,h2,h3,h4,h5,h6,a[href],strong,em,img[src|alt],br,ul,ol,li",
+                          "p[style],h1[style],h2[style],h3[style],h4[style],h5[style],h6[style],br,strong[style],em[style],u,a[href|target],ul[style],ol[style],li[style],span[style]",
                         valid_styles: {
-                          "*": "font-family,text-align,line-height",
+                          p: "text-align,margin,padding,line-height,font-size",
+                          h1: "text-align,margin,padding,line-height,font-size",
+                          h2: "text-align,margin,padding,line-height,font-size",
+                          h3: "text-align,margin,padding,line-height,font-size",
+                          h4: "text-align,margin,padding,line-height,font-size",
+                          h5: "text-align,margin,padding,line-height,font-size",
+                          h6: "text-align,margin,padding,line-height,font-size",
+                          ul: "text-align,margin,padding,line-height,font-size",
+                          ol: "text-align,margin,padding,line-height,font-size",
+                          li: "text-align,margin,padding,line-height,font-size",
+                          span: "font-size",
+                          strong: "font-size",
+                          em: "font-size",
+                          "*": "font-family,font-size",
                         },
-                        paste_preprocess: function (plugin, args) {
-                          args.content = args.content.replace(
-                            /style="[^"]*"/g,
-                            ""
-                          );
-                        },
-                        setup: function (editor) {
-                          editor.on("BeforeSetContent", function (e) {
-                            e.content = e.content.replace(/style="[^"]*"/g, "");
-                          });
-                        },
+                        paste_as_text: false,
+                        paste_enable_default_filters: true,
+                        paste_word_valid_elements:
+                          "p,br,strong,em,u,a,ul,ol,li",
+                        browser_spellcheck: true,
+                        advlist_bullet_styles: "default",
+                        lists_indent_on_tab: false,
                       }}
                     />
                   </div>
