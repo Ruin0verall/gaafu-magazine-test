@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import ArticleEditor from "./pages/ArticleEditor";
+import Latest from "./pages/Latest";
 import "./App.css";
 import { HelmetProvider } from "react-helmet-async";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -24,6 +25,7 @@ const App = () => (
         <Router>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/latest" element={<Latest />} />
             <Route path="/article/:id" element={<Article />} />
             <Route path="/category/:category" element={<Category />} />
             <Route path="/admin/login" element={<AdminLogin />} />
