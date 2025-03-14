@@ -2,13 +2,14 @@ import { Link } from "react-router-dom";
 import { Article, categoryColors, categoryLabels } from "@/lib/types";
 import { Calendar, User } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { memo } from "react";
 
 interface ArticleCardProps {
   article: Article;
   featured?: boolean;
 }
 
-const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
+const ArticleCard = memo(({ article, featured = false }: ArticleCardProps) => {
   const {
     id,
     title,
@@ -19,9 +20,6 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
     created_at,
     category,
   } = article;
-
-  // Debug log to check article data
-  console.log("ArticleCard render:", { id, title, category });
 
   return (
     <div
@@ -94,6 +92,6 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
       </div>
     </div>
   );
-};
+});
 
 export default ArticleCard;
