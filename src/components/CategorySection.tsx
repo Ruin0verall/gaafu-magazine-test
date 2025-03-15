@@ -19,7 +19,7 @@ const CategorySection = memo(
           <div className="text-center mb-10">
             <div className="h-8 w-32 bg-gaafu-muted animate-pulse rounded-full mx-auto"></div>
           </div>
-          <div className="grid grid-cols-2 gap-2 max-w-[580px] mx-auto place-items-center">
+          <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4 sm:gap-1 max-w-[562px] mx-auto items-center">
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
@@ -59,8 +59,8 @@ const CategorySection = memo(
           </h2>
         </div>
 
-        {/* Articles Grid - 2x2 on all screens */}
-        <div className="grid grid-cols-2 gap-2 max-w-[580px] mx-auto place-items-center">
+        {/* Articles - Single column on mobile, grid on larger screens */}
+        <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4 sm:gap-1 max-w-[562px] mx-auto items-center">
           {displayArticles.map((article, index) => (
             <ArticleCard
               key={article.id}

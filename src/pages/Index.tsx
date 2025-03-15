@@ -57,7 +57,7 @@ const Index = () => {
 
       <ErrorBoundary>
         {/* Hero Section with Featured Article */}
-        <section className="pt-16 px-4 md:px-6">
+        <section className="pt-16 px-2 md:px-6">
           <div className="container mx-auto">
             <div className="max-w-7xl mx-auto">
               {featuredLoading ? (
@@ -89,8 +89,8 @@ const Index = () => {
         </section>
 
         {/* Main Content */}
-        <main className="flex-grow py-12">
-          <div className="container mx-auto px-4 md:px-6">
+        <main className="flex-grow py-8 md:py-12">
+          <div className="container mx-auto px-2 md:px-6">
             <div className="max-w-7xl mx-auto">
               {/* Category Sections */}
               {CATEGORY_ORDER.map((category) => (
@@ -104,10 +104,10 @@ const Index = () => {
               ))}
 
               {/* Latest News Link */}
-              <div className="text-center mt-12">
+              <div className="text-center mt-8 md:mt-12">
                 <Link
                   to="/latest"
-                  className="inline-flex items-center text-gaafu-accent hover:text-gaafu-highlight transition-colors font-medium py-3 px-8 rounded-full bg-gaafu-accent-light/50 hover:bg-gaafu-accent-light font-dhivehi text-lg"
+                  className="inline-flex items-center text-gaafu-accent hover:text-gaafu-highlight transition-colors font-medium py-2.5 md:py-3 px-6 md:px-8 rounded-full bg-gaafu-accent-light/50 hover:bg-gaafu-accent-light font-dhivehi text-base md:text-lg"
                 >
                   އެންމެ ފަހުގެ ހުރިހާ ހަބަރުތައް
                 </Link>
