@@ -9,6 +9,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { useFeaturedArticle, useArticlesByCategory } from "@/hooks/useArticles";
 import { Category, categoryLabels } from "@/lib/types";
 import SEO from "@/components/SEO";
+import AdSpace from "@/components/AdSpace";
 
 // Define the order of categories you want to display
 const CATEGORY_ORDER: Category[] = [
@@ -55,9 +56,13 @@ const Index = () => {
 
       <Header />
 
+      <div className="w-full pt-20 pb-4 px-2 bg-white">
+        <AdSpace />
+      </div>
+
       <ErrorBoundary>
         {/* Hero Section with Featured Article */}
-        <section className="pt-16 px-2 md:px-6">
+        <section className="pt-8 px-2 md:px-6">
           <div className="container mx-auto">
             <div className="max-w-7xl mx-auto">
               {featuredLoading ? (
@@ -93,14 +98,18 @@ const Index = () => {
           <div className="container mx-auto px-2 md:px-6">
             <div className="max-w-7xl mx-auto">
               {/* Category Sections */}
-              {CATEGORY_ORDER.map((category) => (
-                <CategorySection
-                  key={category}
-                  category={category}
-                  articles={categoryData[category].articles || []}
-                  isLoading={categoryData[category].isLoading}
-                  error={categoryData[category].error}
-                />
+              {CATEGORY_ORDER.map((category, index) => (
+                <>
+                  <CategorySection
+                    key={category}
+                    category={category}
+                    articles={categoryData[category].articles || []}
+                    isLoading={categoryData[category].isLoading}
+                    error={categoryData[category].error}
+                  />
+                  {/* Add AdSpace after habaru and business categories */}
+                  {(index === 0 || index === 4) && <AdSpace />}
+                </>
               ))}
 
               {/* Latest News Link */}
