@@ -1,111 +1,25 @@
-import { useState, useEffect, useMemo, memo } from "react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ArticleCard from "@/components/ArticleCard";
 import FeaturedArticle from "@/components/FeaturedArticle";
+import CategorySection from "@/components/CategorySection";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import {
-  useFeaturedArticle,
-  useArticles,
-  useArticlesByCategory,
-} from "@/hooks/useArticles";
+import { useFeaturedArticle, useArticlesByCategory } from "@/hooks/useArticles";
 import { Category, categoryLabels } from "@/lib/types";
-import { ChevronRight } from "lucide-react";
 import SEO from "@/components/SEO";
 
-const ArticlesGrid = memo(
-  ({
-    articles,
-    isLoading,
-    error,
-  }: {
-    articles: any[];
-    isLoading: boolean;
-    error: Error | null;
-  }) => {
-    if (isLoading) {
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-gaafu-muted rounded-xl h-80 animate-pulse"
-            ></div>
-          ))}
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="text-center py-16 rounded-xl bg-gaafu-muted/50 my-8">
-          <p className="text-gaafu-foreground/60 font-dhivehi text-lg mb-2">
-            މައްސަލައެއް ދިމާވެއްޖެ
-          </p>
-          <p className="text-sm text-gaafu-foreground/40">{error.message}</p>
-        </div>
-      );
-    }
-
-    if (!articles?.length) {
-      return (
-        <div className="text-center py-16 rounded-xl bg-gaafu-muted/50 my-8">
-          <p className="text-gaafu-foreground/60 font-dhivehi text-lg">
-            މި ބަޔަށް ނިއުސް ނެތް
-          </p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-        {articles.map((article) => (
-          <ArticleCard key={article.id} article={article} />
-        ))}
-      </div>
-    );
-  }
-);
-
-const CategoryFilter = memo(
-  ({
-    selectedCategory,
-    onCategoryChange,
-  }: {
-    selectedCategory: Category | "all";
-    onCategoryChange: (category: Category | "all") => void;
-  }) => (
-    <div className="mb-8 overflow-x-auto">
-      <div className="flex space-x-2 space-x-reverse pb-2">
-        <button
-          onClick={() => onCategoryChange("all")}
-          className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors shadow-sm font-dhivehi ${
-            selectedCategory === "all"
-              ? "bg-gaafu-accent text-white"
-              : "bg-gaafu-muted text-gaafu-foreground hover:bg-gaafu-accent-light"
-          }`}
-        >
-          ހުރިހާ ބައިތައް
-        </button>
-
-        {Object.entries(categoryLabels).map(([key, label]) => (
-          <button
-            key={key}
-            onClick={() => onCategoryChange(key as Category)}
-            className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors shadow-sm font-dhivehi ${
-              selectedCategory === key
-                ? "bg-gaafu-accent text-white"
-                : "bg-gaafu-muted text-gaafu-foreground hover:bg-gaafu-accent-light"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-);
+// Define the order of categories you want to display
+const CATEGORY_ORDER: Category[] = [
+  "habaru",
+  "world",
+  "politics",
+  "sports",
+  "business",
+  "technology",
+  "health",
+];
 
 const Index = () => {
   const {
@@ -113,43 +27,19 @@ const Index = () => {
     isLoading: featuredLoading,
     error: featuredError,
   } = useFeaturedArticle();
-  const [selectedCategory, setSelectedCategory] = useState<Category | "all">(
-    "all"
-  );
-  const {
-    articles: allArticles,
-    isLoading: allArticlesLoading,
-    error: allArticlesError,
-  } = useArticles();
-  const {
-    articles: categoryArticles,
-    isLoading: categoryLoading,
-    error: categoryError,
-  } = useArticlesByCategory(selectedCategory as Category);
   const [isVisible, setIsVisible] = useState(false);
+
+  // Create a map of category data
+  const categoryData = Object.fromEntries(
+    CATEGORY_ORDER.map((category) => {
+      const { articles, isLoading, error } = useArticlesByCategory(category);
+      return [category, { articles, isLoading, error }];
+    })
+  );
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
-
-  // Memoize the articles data
-  const { articles, isLoading, error } = useMemo(
-    () => ({
-      articles: selectedCategory === "all" ? allArticles : categoryArticles,
-      isLoading:
-        selectedCategory === "all" ? allArticlesLoading : categoryLoading,
-      error: selectedCategory === "all" ? allArticlesError : categoryError,
-    }),
-    [
-      selectedCategory,
-      allArticles,
-      categoryArticles,
-      allArticlesLoading,
-      categoryLoading,
-      allArticlesError,
-      categoryError,
-    ]
-  );
 
   return (
     <div
@@ -202,30 +92,25 @@ const Index = () => {
         <main className="flex-grow py-12">
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-7xl mx-auto">
-              {/* Category Filter */}
-              <CategoryFilter
-                selectedCategory={selectedCategory}
-                onCategoryChange={setSelectedCategory}
-              />
-
-              {/* Articles Grid */}
-              <ErrorBoundary>
-                <ArticlesGrid
-                  articles={articles}
-                  isLoading={isLoading}
-                  error={error}
+              {/* Category Sections */}
+              {CATEGORY_ORDER.map((category) => (
+                <CategorySection
+                  key={category}
+                  category={category}
+                  articles={categoryData[category].articles || []}
+                  isLoading={categoryData[category].isLoading}
+                  error={categoryData[category].error}
                 />
-              </ErrorBoundary>
+              ))}
 
-              {/* More News Link */}
+              {/* Latest News Link */}
               <div className="text-center mt-12">
-                <a
-                  href="/latest"
-                  className="inline-flex items-center text-gaafu-accent hover:text-gaafu-highlight transition-colors font-medium py-2 px-6 rounded-full bg-gaafu-accent-light/50 hover:bg-gaafu-accent-light font-dhivehi"
+                <Link
+                  to="/latest"
+                  className="inline-flex items-center text-gaafu-accent hover:text-gaafu-highlight transition-colors font-medium py-3 px-8 rounded-full bg-gaafu-accent-light/50 hover:bg-gaafu-accent-light font-dhivehi text-lg"
                 >
-                  އިތުރު ހަބަރުތައް
-                  <ChevronRight className="h-4 w-4 mr-1" />
-                </a>
+                  އެންމެ ފަހުގެ ހުރިހާ ހަބަރުތައް
+                </Link>
               </div>
             </div>
           </div>
