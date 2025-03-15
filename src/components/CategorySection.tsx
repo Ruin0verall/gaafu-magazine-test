@@ -19,11 +19,11 @@ const CategorySection = memo(
           <div className="text-center mb-10">
             <div className="h-8 w-32 bg-gaafu-muted animate-pulse rounded-full mx-auto"></div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 gap-2 max-w-[580px] mx-auto place-items-center">
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
-                className="bg-gaafu-muted rounded-xl h-64 animate-pulse"
+                className="bg-gaafu-muted rounded-xl h-[280px] w-[280px] animate-pulse"
               ></div>
             ))}
           </div>
@@ -59,8 +59,8 @@ const CategorySection = memo(
           </h2>
         </div>
 
-        {/* Articles Grid - 2x2 on all screens except mobile */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        {/* Articles Grid - 2x2 on all screens */}
+        <div className="grid grid-cols-2 gap-2 max-w-[580px] mx-auto place-items-center">
           {displayArticles.map((article, index) => (
             <ArticleCard
               key={article.id}

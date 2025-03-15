@@ -18,9 +18,16 @@ const Category = () => {
       <div className="min-h-screen">
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16 text-center">
-          <h1 className="text-2xl font-bold mb-4 font-dhivehi">ކެޓަގަރީ ނުފެނުނު</h1>
-          <p className="mb-6 font-dhivehi">ކެޓަގަރީ ލިބެން ނެތް ނުވަތަ ކުށެއް ދިމާވެއްޖެ</p>
-          <Link to="/" className="text-gaafu-accent hover:text-gaafu-highlight font-dhivehi">
+          <h1 className="text-2xl font-bold mb-4 font-dhivehi">
+            ކެޓަގަރީ ނުފެނުނު
+          </h1>
+          <p className="mb-6 font-dhivehi">
+            ކެޓަގަރީ ލިބެން ނެތް ނުވަތަ ކުށެއް ދިމާވެއްޖެ
+          </p>
+          <Link
+            to="/"
+            className="text-gaafu-accent hover:text-gaafu-highlight font-dhivehi"
+          >
             މައި ސަފްޙާއަށް ދާންވީތަ؟
           </Link>
         </div>
@@ -44,9 +51,16 @@ const Category = () => {
       <div className="min-h-screen">
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16 text-center">
-          <h1 className="text-2xl font-bold mb-4 font-dhivehi">ކުށެއް ދިމާވެއްޖެ</h1>
-          <p className="mb-6 font-dhivehi">މަޢުލޫމާތު ހޯދުމުގައި މައްސަލައެއް ދިމާވެއްޖެ</p>
-          <Link to="/" className="text-gaafu-accent hover:text-gaafu-highlight font-dhivehi">
+          <h1 className="text-2xl font-bold mb-4 font-dhivehi">
+            ކުށެއް ދިމާވެއްޖެ
+          </h1>
+          <p className="mb-6 font-dhivehi">
+            މަޢުލޫމާތު ހޯދުމުގައި މައްސަލައެއް ދިމާވެއްޖެ
+          </p>
+          <Link
+            to="/"
+            className="text-gaafu-accent hover:text-gaafu-highlight font-dhivehi"
+          >
             މައި ސަފްޙާއަށް ދާންވީތަ؟
           </Link>
         </div>
@@ -76,16 +90,16 @@ const Category = () => {
 
             {/* Articles */}
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[...Array(6)].map((_, i) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 place-items-center">
+                {[...Array(8)].map((_, i) => (
                   <div
                     key={i}
-                    className="bg-gaafu-muted rounded-lg h-80 animate-pulse"
+                    className="bg-gaafu-muted rounded-lg h-[280px] w-[280px] animate-pulse"
                   ></div>
                 ))}
               </div>
             ) : articles.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 place-items-center">
                 {articles.map((article) => (
                   <ArticleCard key={article.id} article={article} />
                 ))}

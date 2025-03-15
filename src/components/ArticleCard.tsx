@@ -36,19 +36,21 @@ const ArticleCard = memo(
 
     return (
       <div
-        className={`group overflow-hidden rounded-xl card-shadow transition-all duration-500 ${
-          featured ? "md:flex animate-fade-in" : "h-full animate-slide-in"
+        className={`group overflow-hidden rounded-lg shadow-sm transition-all duration-500 flex flex-col bg-white ${
+          featured
+            ? "md:flex-row animate-fade-in"
+            : "h-[280px] w-[280px] animate-slide-in"
         }`}
       >
         {/* Image Container */}
         <div
-          className={`relative overflow-hidden ${
+          className={`relative overflow-hidden shrink-0 ${
             featured
-              ? "md:w-1/2 aspect-video md:aspect-auto rounded-t-xl md:rounded-r-none md:rounded-l-xl"
-              : "aspect-video rounded-t-xl"
+              ? "md:w-1/2 aspect-video md:aspect-auto rounded-t-lg md:rounded-r-none md:rounded-l-lg"
+              : "h-[140px] rounded-t-lg"
           }`}
         >
-          <Link to={`/article/${id}`}>
+          <Link to={`/article/${id}`} className="block h-full">
             <img
               src={image_url}
               alt={title}
@@ -72,8 +74,8 @@ const ArticleCard = memo(
           </Link>
           {category && (
             <div
-              className={`absolute top-4 right-4 z-10 py-1.5 px-4 rounded-full text-sm font-medium 
-              shadow-lg backdrop-blur-sm font-dhivehi ${categoryColors[category]}`}
+              className={`absolute top-2 right-2 z-10 py-1 px-2.5 rounded-full text-sm font-medium 
+              shadow-sm backdrop-blur-sm font-dhivehi ${categoryColors[category]}`}
               style={{ willChange: "opacity" }}
             >
               {categoryLabels[category]}
@@ -83,16 +85,18 @@ const ArticleCard = memo(
 
         {/* Content */}
         <div
-          className={`p-5 md:p-6 bg-white ${
+          className={`p-3 flex-1 flex flex-col ${
             featured
-              ? "md:w-1/2 flex flex-col justify-center md:rounded-l-none md:rounded-r-xl"
-              : "rounded-b-xl"
+              ? "md:w-1/2 justify-center md:rounded-l-none md:rounded-r-lg"
+              : "rounded-b-lg h-[140px]"
           }`}
         >
-          <Link to={`/article/${id}`}>
+          <Link to={`/article/${id}`} className="flex-1">
             <h3
-              className={`font-bold text-gaafu-foreground group-hover:text-gaafu-teal transition-colors font-dhivehi ${
-                featured ? "text-xl md:text-2xl mb-3" : "text-lg mb-2"
+              className={`font-bold text-gaafu-foreground group-hover:text-gaafu-teal transition-colors font-dhivehi line-clamp-2 ${
+                featured
+                  ? "text-xl md:text-2xl mb-2"
+                  : "text-base leading-6 mb-1.5"
               }`}
               style={{ willChange: "transform" }}
             >
@@ -101,19 +105,19 @@ const ArticleCard = memo(
           </Link>
 
           {excerpt && (
-            <p className="text-gaafu-foreground/80 mb-4 line-clamp-2 font-dhivehi">
+            <p className="text-gaafu-foreground/80 mb-1.5 line-clamp-1 font-dhivehi text-sm leading-5">
               {excerpt}
             </p>
           )}
 
-          <div className="flex items-center justify-between text-sm text-gaafu-foreground/60">
+          <div className="flex items-center justify-between text-sm text-gaafu-foreground/60 mt-auto">
             {(author || author_name) && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <User className="h-4 w-4" />
                 <span className="font-dhivehi">{author || author_name}</span>
               </div>
             )}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <Calendar className="h-4 w-4" />
               <span className="font-dhivehi">{formatDate(created_at)}</span>
             </div>
