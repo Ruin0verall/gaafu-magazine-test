@@ -45,7 +45,7 @@ const Header = () => {
               <img
                 src="/Logo/Burgendary Main Colour.svg"
                 alt="Havaasa Logo"
-                className="h-8 md:h-10"
+                className="h-10 md:h-14"
               />
             </Link>
 
