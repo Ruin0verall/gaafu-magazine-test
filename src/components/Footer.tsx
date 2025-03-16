@@ -97,7 +97,7 @@ const Footer = () => {
             <div className="flex items-center justify-between">
               {/* Copyright */}
               <div className="text-[8.6px] font-light text-white/80">
-                NEWSLAB MEDIA Private Limited. All rights reserved 2025 – 2024©
+                Havaasa. All rights reserved 2025 – 2024©
               </div>
 
               {/* Legal Links */}
