@@ -8,6 +8,7 @@ import { Calendar, User, Share2 } from "lucide-react";
 import { categoryColors, categoryLabels } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 import { getApiUrl } from "@/lib/config";
+import AdSpace from "@/components/AdSpace";
 
 const API_URL = getApiUrl();
 
@@ -139,10 +140,15 @@ const Article = () => {
             <div className="prose prose-lg max-w-none font-dhivehi">
               {/* Excerpt as intro paragraph */}
               {article.excerpt && (
-                <p className="font-medium text-xl font-dhivehi">
+                <p className="font-medium text-xl font-dhivehi text-right whitespace-normal break-words mb-6 leading-[1]">
                   {article.excerpt}
                 </p>
               )}
+
+              {/* Advertisement Square */}
+              <div className="mb-8">
+                <AdSpace width="300px" height="300px" />
+              </div>
 
               {/* Main content */}
               <div
@@ -150,6 +156,11 @@ const Article = () => {
                 dangerouslySetInnerHTML={{ __html: article.content }}
                 style={{ fontSize: "16px" }}
               />
+            </div>
+
+            {/* Banner Advertisement */}
+            <div className="my-12">
+              <AdSpace width="728px" height="90px" />
             </div>
 
             {/* Share */}

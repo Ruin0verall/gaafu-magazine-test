@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { Article, Category } from "@/lib/types";
-import { getApiUrl } from "@/lib/config";
+import { Article, Category } from "../lib/types";
+import { getApiUrl } from "../lib/config";
 import useApi from "./useApi";
 
 const API_URL = getApiUrl();
@@ -9,7 +9,7 @@ const ARTICLES_PER_PAGE = 10;
 // Cache for articles
 let articlesCache: Article[] | null = null;
 let lastFetchTime = 0;
-const CACHE_DURATION = 60000; // Cache for 1 minute
+const CACHE_DURATION = 10000; // Cache for 10 seconds instead of 1 minute
 
 // Common fetch options for all API calls
 const fetchOptions: RequestInit = {
@@ -20,6 +20,12 @@ const fetchOptions: RequestInit = {
   mode: "cors",
 };
 
+// Function to invalidate cache
+export function invalidateArticlesCache() {
+  articlesCache = null;
+  lastFetchTime = 0;
+}
+
 async function fetchArticlesWithCache(): Promise<Article[]> {
   const now = Date.now();
   if (articlesCache && now - lastFetchTime < CACHE_DURATION) {
@@ -27,6 +33,7 @@ async function fetchArticlesWithCache(): Promise<Article[]> {
     return articlesCache;
   }
 
+  console.log("Fetching fresh articles from API");
   const response = await fetch(`${API_URL}/articles`, fetchOptions);
   if (!response.ok) {
     throw new Error(
@@ -78,6 +85,7 @@ async function fetchArticlesWithCache(): Promise<Article[]> {
     };
   });
 
+  console.log("Mapped articles with categories:", articlesWithCategories);
   articlesCache = articlesWithCategories;
   lastFetchTime = now;
   return articlesWithCategories;
