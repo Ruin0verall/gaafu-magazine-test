@@ -105,7 +105,7 @@ const ArticleCard = memo(
           </Link>
 
           {excerpt && (
-            <p className="text-gaafu-foreground/80 mb-1.5 line-clamp-2 font-dhivehi text-sm leading-5 overflow-hidden text-right">
+            <p className="text-gaafu-foreground/80 mb-1.5 line-clamp-2 font-dhivehi text-sm leading-5">
               {excerpt}
             </p>
           )}

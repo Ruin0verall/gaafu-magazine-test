@@ -42,7 +42,11 @@ const Header = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img src="/logo.svg" className="h-8 w-auto" alt="Havaasa Logo" />
+              <img
+                src="/Logo/Burgendary Main Colour.svg"
+                alt="Havaasa Logo"
+                className="h-8 md:h-10"
+              />
             </Link>
 
             {/* Desktop Navigation */}
