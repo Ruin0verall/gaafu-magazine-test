@@ -25,7 +25,11 @@ const SEO = ({
 }: SEOProps) => {
   const fullTitle = `${title} - ${SITE_NAME}`;
   const baseUrl = url.endsWith("/") ? url.slice(0, -1) : url;
-  const imageUrl = image.startsWith("http") ? image : `${baseUrl}${image}`;
+  const imageUrl = image
+    ? image.startsWith("http")
+      ? image
+      : `${baseUrl}${image}`
+    : `${baseUrl}/og-image.png`;
 
   return (
     <Helmet>

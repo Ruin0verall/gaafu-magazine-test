@@ -169,11 +169,13 @@ const ArticleEditor: React.FC = () => {
 
       let response;
       if (id) {
+        // Update existing article
         response = await supabase
           .from("articles")
           .update(articleData)
           .eq("id", id);
       } else {
+        // Create new article
         response = await supabase.from("articles").insert([articleData]);
       }
 
