@@ -24,6 +24,8 @@ const SEO = ({
   section,
 }: SEOProps) => {
   const fullTitle = `${title} - ${SITE_NAME}`;
+  const baseUrl = url.endsWith("/") ? url.slice(0, -1) : url;
+  const imageUrl = image.startsWith("http") ? image : `${baseUrl}${image}`;
 
   return (
     <Helmet>
@@ -34,19 +36,20 @@ const SEO = ({
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />
       <meta property="og:url" content={url} />
-      <meta property="og:title" content={title} />
+      <meta property="og:title" content={`${title} - ${SITE_NAME}`} />
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
+      <meta property="og:image" content={imageUrl} />
+      <meta property="og:image:secure_url" content={imageUrl} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:url" content={url} />
-      <meta name="twitter:title" content={title} />
+      <meta name="twitter:title" content={`${title} - ${SITE_NAME}`} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
+      <meta property="twitter:image" content={imageUrl} />
 
       {/* Article Specific Meta Tags */}
       {type === "article" && publishedTime && (
