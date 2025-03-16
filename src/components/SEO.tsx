@@ -15,13 +15,13 @@ const SEO = ({
   title,
   description,
   image = "/og-image.png",
-  url = "https://gaafu.mv",
-  type = "website",
+  url = "https://havaasa.com",
+  type = "article",
   publishedTime,
   author,
   section,
 }: SEOProps) => {
-  const fullTitle = `${title} - ގާފު މަޖައްލާ`;
+  const fullTitle = `${title} - ހަވާސާ މީޑިއާ`;
 
   return (
     <Helmet>

@@ -42,11 +42,7 @@ const Header = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img
-                src="/Logo/Burgendary Main Colour.svg"
-                alt="Gaafu Logo"
-                className="h-8 md:h-10"
-              />
+              <img src="/logo.svg" className="h-8 w-auto" alt="Havaasa Logo" />
             </Link>
 
             {/* Desktop Navigation */}
@@ -84,7 +80,7 @@ const Header = () => {
                 to="/about"
                 className="px-3 py-2 text-gaafu-foreground hover:text-gaafu-teal transition-colors font-dhivehi"
               >
-                ގާފުއާއި ބެހޭ
+                ހަވާސާއާއި ބެހޭ
               </Link>
             </nav>
 
@@ -155,7 +151,7 @@ const Header = () => {
                 className="px-3 py-2 text-lg font-medium border-b border-gaafu-border font-dhivehi"
                 onClick={() => setIsMenuOpen(false)}
               >
-                ގާފުއާއި ބެހޭ
+                ހަވާސާއާއި ބެހޭ
               </Link>
             </nav>
           </div>
