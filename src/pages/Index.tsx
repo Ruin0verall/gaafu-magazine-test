@@ -54,10 +54,6 @@ const Index = () => {
         type="website"
       />
 
-      <Helmet>
-        <title>ހަވާސާ މީޑިއާ</title>
-      </Helmet>
-
       <Header />
 
       <div className="w-full pt-20 pb-4 px-2 bg-white">

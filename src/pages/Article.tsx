@@ -66,7 +66,7 @@ const Article = () => {
     );
   }
 
-  const canonicalUrl = `https://gaafu.mv/article/${article.id}`;
+  const canonicalUrl = `https://havaasa.com/article/${article.id}`;
 
   return (
     <div
