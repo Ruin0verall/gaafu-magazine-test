@@ -147,7 +147,7 @@ const Article = () => {
 
               {/* Advertisement Square */}
               <div className="mb-8">
-                <AdSpace width="300px" height="300px" />
+                <AdSpace variant="square" />
               </div>
 
               {/* Main content */}
@@ -160,7 +160,7 @@ const Article = () => {
 
             {/* Banner Advertisement */}
             <div className="my-12">
-              <AdSpace width="728px" height="90px" />
+              <AdSpace variant="banner" />
             </div>
 
             {/* Share */}

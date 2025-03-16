@@ -57,7 +57,7 @@ const Index = () => {
       <Header />
 
       <div className="w-full pt-20 pb-4 px-2 bg-white">
-        <AdSpace />
+        <AdSpace variant="banner" />
       </div>
 
       <ErrorBoundary>
@@ -108,7 +108,11 @@ const Index = () => {
                     error={categoryData[category].error}
                   />
                   {/* Add AdSpace after habaru and business categories */}
-                  {(index === 0 || index === 4) && <AdSpace />}
+                  {(index === 0 || index === 4) && (
+                    <div className="my-8">
+                      <AdSpace variant="banner" />
+                    </div>
+                  )}
                 </>
               ))}
 
