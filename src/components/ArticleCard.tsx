@@ -39,7 +39,7 @@ const ArticleCard = memo(
         className={`group overflow-hidden rounded-lg shadow-sm transition-all duration-500 flex flex-col bg-white ${
           featured
             ? "md:flex-row animate-fade-in"
-            : "h-[280px] w-[280px] animate-slide-in"
+            : "h-[350px] sm:h-[280px] w-full sm:w-[280px] animate-slide-in"
         }`}
       >
         {/* Image Container */}
@@ -47,7 +47,7 @@ const ArticleCard = memo(
           className={`relative overflow-hidden shrink-0 ${
             featured
               ? "md:w-1/2 aspect-video md:aspect-auto rounded-t-lg md:rounded-r-none md:rounded-l-lg"
-              : "h-[140px] rounded-t-lg"
+              : "h-[200px] sm:h-[140px] rounded-t-lg"
           }`}
         >
           <Link to={`/article/${id}`} className="block h-full">
@@ -88,7 +88,7 @@ const ArticleCard = memo(
           className={`p-3 flex-1 flex flex-col ${
             featured
               ? "md:w-1/2 justify-center md:rounded-l-none md:rounded-r-lg"
-              : "rounded-b-lg h-[140px]"
+              : "rounded-b-lg h-[150px] sm:h-[140px]"
           }`}
         >
           <Link to={`/article/${id}`} className="flex-1">
@@ -96,7 +96,7 @@ const ArticleCard = memo(
               className={`font-bold text-gaafu-foreground group-hover:text-gaafu-teal transition-colors font-dhivehi line-clamp-2 ${
                 featured
                   ? "text-xl md:text-2xl mb-2"
-                  : "text-base leading-6 mb-1.5"
+                  : "text-lg sm:text-base leading-6 mb-1.5"
               }`}
               style={{ willChange: "transform" }}
             >
