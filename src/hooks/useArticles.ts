@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Article, Category } from "@/lib/types";
 import { getApiUrl } from "@/lib/config";
 import useApi from "./useApi";
@@ -9,7 +9,7 @@ const ARTICLES_PER_PAGE = 10;
 // Cache for articles
 let articlesCache: Article[] | null = null;
 let lastFetchTime = 0;
-const CACHE_DURATION = 60000; // Cache for 1 minute
+const CACHE_DURATION = 30000; // Cache for 30 seconds
 
 // Common fetch options for all API calls
 const fetchOptions: RequestInit = {
@@ -20,14 +20,24 @@ const fetchOptions: RequestInit = {
   mode: "cors",
 };
 
+// Add timestamp to URL to bust cache
 async function fetchArticlesWithCache(): Promise<Article[]> {
   const now = Date.now();
   if (articlesCache && now - lastFetchTime < CACHE_DURATION) {
-    console.log("Returning cached articles:", articlesCache);
     return articlesCache;
   }
 
-  const response = await fetch(`${API_URL}/articles`, fetchOptions);
+  const timestamp = new Date().getTime();
+  const response = await fetch(`${API_URL}/articles?_t=${timestamp}`, {
+    ...fetchOptions,
+    headers: {
+      ...fetchOptions.headers,
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Pragma: "no-cache",
+      Expires: "0",
+    },
+  });
+
   if (!response.ok) {
     throw new Error(
       `Failed to fetch articles: ${response.status} ${response.statusText}`
@@ -40,75 +50,78 @@ async function fetchArticlesWithCache(): Promise<Article[]> {
   }
 
   // Map category_id to category name
-  const articlesWithCategories = data.map((article: Article) => {
-    let category: Category | undefined;
-    switch (article.category_id) {
-      case 1:
-        category = "politics";
-        break;
-      case 2:
-        category = "business";
-        break;
-      case 3:
-        category = "sports";
-        break;
-      case 4:
-        category = "technology";
-        break;
-      case 5:
-        category = "health";
-        break;
-      case 6:
-        category = "world";
-        break;
-      case 7:
-        category = "habaru";
-        break;
-    }
-
-    if (!category) {
-      console.warn(
-        `Unknown category_id: ${article.category_id} for article ${article.id}`
-      );
-    }
-
-    return {
-      ...article,
-      category,
-    };
-  });
+  const articlesWithCategories = data.map((article: Article) => ({
+    ...article,
+    category: getCategoryFromId(article.category_id),
+  }));
 
   articlesCache = articlesWithCategories;
   lastFetchTime = now;
   return articlesWithCategories;
 }
 
+// Helper function to get category from ID
+function getCategoryFromId(categoryId: number): Category | undefined {
+  const categories: Record<number, Category> = {
+    1: "politics",
+    2: "business",
+    3: "sports",
+    4: "technology",
+    5: "health",
+    6: "world",
+    7: "habaru",
+  };
+  return categories[categoryId];
+}
+
+// Add cache invalidation function
+export function invalidateArticlesCache() {
+  articlesCache = null;
+  lastFetchTime = 0;
+}
+
+// Update useArticles to include refetch functionality
 export function useArticles(page = 1) {
+  const [forceUpdate, setForceUpdate] = useState(0);
+
   const {
     data: articles,
     isLoading,
     error,
-  } = useApi<Article[]>(() => fetchArticlesWithCache(), [page], {
+  } = useApi<Article[]>(() => fetchArticlesWithCache(), [page, forceUpdate], {
     initialData: [],
   });
+
+  const refetch = useCallback(() => {
+    invalidateArticlesCache();
+    setForceUpdate((prev) => prev + 1);
+  }, []);
 
   return {
     articles: articles || [],
     isLoading,
     error,
+    refetch,
     totalCount: articles?.length || 0,
     totalPages: Math.ceil((articles?.length || 0) / ARTICLES_PER_PAGE),
   };
 }
 
+// Update useArticlesByCategory to include refetch functionality
 export function useArticlesByCategory(category: Category | "all", page = 1) {
+  const [forceUpdate, setForceUpdate] = useState(0);
+
   const {
     data: allArticles,
     isLoading,
     error,
-  } = useApi<Article[]>(() => fetchArticlesWithCache(), [category, page], {
-    initialData: [],
-  });
+  } = useApi<Article[]>(
+    () => fetchArticlesWithCache(),
+    [category, page, forceUpdate],
+    {
+      initialData: [],
+    }
+  );
 
   const filteredArticles = useMemo(() => {
     if (category === "all") return allArticles || [];
@@ -118,10 +131,16 @@ export function useArticlesByCategory(category: Category | "all", page = 1) {
     );
   }, [allArticles, category]);
 
+  const refetch = useCallback(() => {
+    invalidateArticlesCache();
+    setForceUpdate((prev) => prev + 1);
+  }, []);
+
   return {
     articles: filteredArticles,
     isLoading,
     error,
+    refetch,
     totalCount: filteredArticles.length,
     totalPages: Math.ceil(filteredArticles.length / ARTICLES_PER_PAGE),
   };

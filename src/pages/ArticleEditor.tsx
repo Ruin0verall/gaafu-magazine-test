@@ -4,6 +4,7 @@ import { Category, CategoryData, categoryLabels } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { Editor } from "@tinymce/tinymce-react";
+import { invalidateArticlesCache } from "@/hooks/useArticles";
 
 const TINYMCE_API_KEY = import.meta.env.VITE_TINYMCE_API_KEY;
 
@@ -181,7 +182,10 @@ const ArticleEditor: React.FC = () => {
 
       if (response.error) throw response.error;
 
-      console.log("Article saved successfully");
+      // Invalidate cache after successful update/creation
+      invalidateArticlesCache();
+
+      // Navigate back to admin dashboard
       navigate("/admin/dashboard");
     } catch (err: any) {
       console.error("Error saving article:", err);
